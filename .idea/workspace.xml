@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/5dba92b3-c6ac-4f62-a5e2-10d399824154.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/5dba92b3-c6ac-4f62-a5e2-10d399824154/storage_v2/_src_/schema/information_schema.FNRwLQ.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/5dba92b3-c6ac-4f62-a5e2-10d399824154/storage_v2/_src_/schema/mysql.osA4Bg.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/5dba92b3-c6ac-4f62-a5e2-10d399824154/storage_v2/_src_/schema/performance_schema.kIw0nw.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/5dba92b3-c6ac-4f62-a5e2-10d399824154/storage_v2/_src_/schema/sys.zb4BAA.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/AuthenticationServiceApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/Result.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/MinioConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/MyBatisPlusConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/WebMvcConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/constants/OSSConstant.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/controller/UserController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/BusinessException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/ThrowUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/loderBalance/ConsistentHashLoadBalancer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/loderBalance/LoadBalancer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/mapper/UserBalanceMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/mapper/UserMapper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserLogOutRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserLoginCodeRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserLoginPwdRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserRegisterRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserSMSRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/dto/UserUpdateAvatarRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/entity/User.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/entity/UserBalance.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ConfigEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ErrorEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/SuccessEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/TimeOutEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/vo/BaseResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/vo/UploadUrlResponse.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/vo/UserVO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/UserService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/impl/UserServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/JwtUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/NicknameGeneratorUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/OSSUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/RandomNumUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/RedisLockExecutor.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ResultUtils.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ServiceInstanceUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/main/resources/static/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/src/test/java/com/wangyutao/authenticationservice/AuthenticationServiceApplicationTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/GatewayApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/filter/AuthorizeFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/utils/JwtUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Gateway/src/test/java/com/wangyutao/gateway/GatewayApplicationTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/pom.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/RealTimeCommunicationApplication.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/common/Result.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/common/ResultCode.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/common/ResultGenerator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/common/ServiceException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/config/JsonConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/config/RedisSubscriberConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/config/WebMvcConfigurerImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/controller/PushController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/controller/RcvMsgController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/controller/SysController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/ClientMessageTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/ConfigEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/MessageTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/PushTypeEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/TimeOutEnum.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/AckData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/HeartBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/LogOutData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/Message.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/MessageDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/PictureMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/PictureMessageBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/RedPacketMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/RedPacketMessageBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/TextMessage.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/TextMessageBody.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/FriendApplicationNotification.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/MomentNotification.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/NewGroupSessionNotification.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/NewSessionNotification.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/vo/OnlineUserVo.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserKickoutMessageListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserOfflineListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/service/NettyMessageService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/service/SysService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/service/impl/SysServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/utils/JwtUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/MessageInboundHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettyServer.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettySessionManager.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/WebSocketTokenAuthHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/resources/application.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/test/java/com/wangyutao/realtimecommunication/RealTimeCommunicationApplicationTests.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Exception" />
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Nuguriyyds"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/Nuguriyyds/InfiniteChat.git",
+    "accountId": "3cf0dc14-f221-49e9-9d6d-580dcfc25d3c"
+  }
+}]]></component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="3AbxuACLmwzbyvIkTY7wxYq32zu" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Maven.Gateway [compile].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Spring Boot.RealTimeCommunicationApplication.executor": "Run",
+    "git-widget-placeholder": "master",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "project.structure.last.edited": "项目",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.ignored.files",
+    "应用程序.AuthenticationServiceApplication.executor": "Run",
+    "应用程序.GatewayApplication.executor": "Run",
+    "应用程序.RealTimeCommunicationApplication.executor": "Run"
+  },
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
+    ]
+  }
+}]]></component>
+  <component name="RunManager" selected="应用程序.GatewayApplication">
+    <configuration name="AuthenticationServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.wangyutao.authenticationservice.AuthenticationServiceApplication" />
+      <module name="AuthenticationService" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.wangyutao.authenticationservice.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.wangyutao.gateway.GatewayApplication" />
+      <module name="Gateway" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.wangyutao.gateway.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RealTimeCommunicationApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.wangyutao.realtimecommunication.RealTimeCommunicationApplication" />
+      <module name="RealTimeCommunication" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.wangyutao.realtimecommunication.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="应用程序.GatewayApplication" />
+        <item itemvalue="应用程序.AuthenticationServiceApplication" />
+        <item itemvalue="应用程序.RealTimeCommunicationApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="" />
+      <created>1772875293563</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772875293563</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

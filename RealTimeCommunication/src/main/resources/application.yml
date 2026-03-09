@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: RealTimeCommunicationService
+  cloud:
+    nacos:
+      server-addr: 127.0.0.1:18375
+      username: nacos
+      password: Xp4#tG7!vQ
+      #server-addr: common-nacos-dev.magestack.cn:8848
+      discovery:
+        ip: 127.0.0.1
+  redis:
+    host: 127.0.0.1
+    port: 59000
+    password: e65K4t8w2
+
+server:
+  port: 8083
+
+netty:
+  port: 9101

@@ -1,0 +1,47 @@
+server:
+  port: 10010
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: Gateway
+  cloud:
+    nacos:
+      discovery:
+        # 你的 Nacos 地址
+        server-addr: 127.0.0.1:18375
+        username: nacos
+        password: Xp4#tG7!vQ
+    gateway:
+      # 跨域全局配置 (极其重要，前端连网关必配)
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*" # 允许所有来源跨域
+            allowedMethods: "*"        # 允许所有 HTTP 方法 (GET, POST, PATCH 等)
+            allowedHeaders: "*"        # 允许携带所有头信息 (包括 Authorization)
+            allowCredentials: true     # 允许携带 Cookie
+            maxAge: 36000
+
+      # 🌟 核心路由表 (动态路由分发)
+      routes:
+        # 1. 登录注册/用户服务路由
+        - id: AuthenticationService
+          uri: lb://AuthenticationService # lb 代表 LoadBalance (负载均衡)，去 Nacos 找这个名字的服务
+          predicates:
+            - Path=/api/v1/user/** # 只要是 /api/v1/user/ 开头的请求，全转给 Auth 服务
+
+        # 2. 实时通讯/聊天服务路由 (为你的 Netty 模块预留)
+        - id: RealTimeCommunicationService
+          uri: lb://RealTimeCommunicationService
+          predicates:
+            - Path=/api/v1/message/** # 比如获取历史消息、离线消息等接口
+
+        # 3. WebSocket 长连接转发预留 (将来连 Netty 用的)
+        # 注意：WebSocket 的协议头是 ws:// 或者 lb:ws://
+        - id: NettyWebSocketRouter
+          uri: lb:ws://RealTimeCommunicationService
+          predicates:
+            - Path=/api/v1/chat/message   # 匹配你 Netty 里的 WebSocket 路径
