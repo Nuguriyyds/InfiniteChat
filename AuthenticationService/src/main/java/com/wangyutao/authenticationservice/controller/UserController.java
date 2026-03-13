@@ -53,10 +53,10 @@ public class UserController {
     }
 
     @PostMapping("/v1/user/logout")
-    public Result logout(@RequestHeader("X-User-Id") String userId) { // 🌟 抛弃 Body 传参，用网关的真实 ID
+    public Result logout(@RequestHeader("X-User-Id") Long userId) { // 🌟 抛弃 Body 传参，用网关的真实 ID
         // 包装一下以兼容你现有的 Service 逻辑
         UserLogOutRequest request = new UserLogOutRequest();
-        request.setUserId(Long.valueOf(userId));
+        request.setUserId(userId);
 
         userService.userLogout(request);
         return ResultGenerator.genSuccessResult(SuccessEnum.SUCCESS_LOGOUT.getMessage());
@@ -64,7 +64,7 @@ public class UserController {
 
     @PatchMapping("/v1/user/avatar")
     public Result updateAvatar(@Valid @RequestBody UserUpdateAvatarRequest request,
-                               @RequestHeader("X-User-Id") String userId) { // 🌟 直接从网关塞的 Header 拿
+                               @RequestHeader("X-User-Id") Long userId) { // 🌟 直接从网关塞的 Header 拿
         userService.updateAvatar(userId, request);
         return ResultGenerator.genSuccessResult(null);
     }
@@ -86,8 +86,10 @@ public class UserController {
         ThrowUtils.throwIf(StringUtils.isBlank(refreshToken), ErrorEnum.NOT_LOGIN_ERROR);
 
         // 2. 解析 RefreshToken 获取 UserId (既然能解析出来，说明它没过期)
-        String userId = JwtUtil.getUserIdSafe(refreshToken);
-        ThrowUtils.throwIf(StringUtils.isBlank(userId), ErrorEnum.LOGIN_EXPIRED);
+        String userIdStr = JwtUtil.getUserIdSafe(refreshToken);
+        ThrowUtils.throwIf(StringUtils.isBlank(userIdStr), ErrorEnum.LOGIN_EXPIRED);
+
+        Long userId = Long.valueOf(userIdStr);
 
         // 3. 调用 Service 层，查 Redis 校验并签发全新的双 Token
         UserVO userVO = userService.refreshToken(userId, refreshToken);

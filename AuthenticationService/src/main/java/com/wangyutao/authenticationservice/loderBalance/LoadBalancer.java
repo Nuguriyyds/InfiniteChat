@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface LoadBalancer {
 
-    ServiceInstance select(List<ServiceInstance> instances, String userId);
+    ServiceInstance select(List<ServiceInstance> instances, Long userId);
 }

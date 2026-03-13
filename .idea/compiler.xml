@@ -8,8 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="RealTimeCommunication" />
+        <module name="Messaging" />
         <module name="AuthenticationService" />
         <module name="Gateway" />
+        <module name="contact" />
+        <module name="moment" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

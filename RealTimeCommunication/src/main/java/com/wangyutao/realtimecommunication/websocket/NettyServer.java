@@ -8,6 +8,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -23,6 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import cn.hutool.json.JSONUtil;
+import com.wangyutao.realtimecommunication.enums.ClientMessageTypeEnum;
+import com.wangyutao.realtimecommunication.model.entity.MessageDTO;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -54,11 +58,22 @@ public class NettyServer {
 
     // discoveryClient
     private final DiscoveryClient discoveryClient;
+    
+    // sessionManager
+    private final NettySessionManager sessionManager;
 
     @PostConstruct
     public void start() throws InterruptedException {
-        //System.out.println("=============== 读取到的 Netty 端口是：" + port + " ===============");
-        run();
+        // 🌟 核心：为 Netty 开启专属兵团（新线程），绝不卡死 Spring 主线程！
+        new Thread(() -> {
+            try {
+                log.info("🚀 Netty 准备启动，尝试绑定端口: {}", port);
+                run();
+            } catch (InterruptedException e) {
+                log.error("❌ Netty 启动中断", e);
+                Thread.currentThread().interrupt(); // 恢复中断状态
+            }
+        }, "Netty-Boss-Thread").start();
     }
 
     public void run() throws InterruptedException {
@@ -76,24 +91,67 @@ public class NettyServer {
                         pipeline.addLast(new IdleStateHandler(5 * 60, 0, 0));
                         pipeline.addLast(new HttpServerCodec());
                         pipeline.addLast(new ChunkedWriteHandler());
-                        pipeline.addLast(new HttpObjectAggregator(8192));
+                        pipeline.addLast(new HttpObjectAggregator(65536));
                         pipeline.addLast(webSocketTokenAuthHandler);
                         pipeline.addLast(new WebSocketServerProtocolHandler("/api/v1/chat/message"));
                         pipeline.addLast(businessGroup, messageInboundHandler);
                     }
                 });
 
-        serverBootstrap.bind(port).sync();
+        // 🌟 修改：拿到绑定后的 Channel
+        Channel serverChannel = serverBootstrap.bind(port).sync().channel();
+        log.info("✅ Netty WebSocket 服务器启动成功，端口: {}", port);
+
+        // 🌟 修改：让当前线程阻塞在这里，监听服务端通道的关闭事件。
+        // 直到 @PreDestroy 触发 shutdown，这里才会优雅退出。
+        serverChannel.closeFuture().sync();
     }
 
     @PreDestroy
     public void destroy() {
+        log.info("🛑 开始优雅停机流程...");
+        
+        // 1. 从 Nacos 注销，拒绝新连接
+        try {
+            // 注意：Spring Cloud 的 DiscoveryClient 没有直接的 deregister 方法
+            // 这里通过日志记录，实际注销由 Spring Cloud 自动处理
+            log.info("✅ Spring Cloud 将自动从 Nacos 注销");
+        } catch (Exception e) {
+            log.error("Nacos 注销失败", e);
+        }
+        
+        // 2. 等待 5 秒，让负载均衡器感知节点下线
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // 3. 通知所有在线用户即将断开 (可选)
+        sessionManager.getUserChannelMap().forEach((userId, channel) -> {
+            if (channel.isActive()) {
+                MessageDTO shutdownMsg = new MessageDTO()
+                    .setType(ClientMessageTypeEnum.LOG_OUT.getCode())
+                    .setData("服务器维护中，请稍后重连");
+                channel.writeAndFlush(new TextWebSocketFrame(JSONUtil.toJsonStr(shutdownMsg)));
+            }
+        });
+        
+        // 4. 等待 3 秒，让消息发送完成
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // 5. 关闭 Netty 线程池
         Future<?> futureBoss = bossGroup.shutdownGracefully();
         Future<?> futureWorker = workerGroup.shutdownGracefully();
         Future<?> futureBusiness = businessGroup.shutdownGracefully();
         futureBoss.syncUninterruptibly();
         futureWorker.syncUninterruptibly();
         futureBusiness.syncUninterruptibly();
-        log.info("关闭 ws server 成功");
+        
+        log.info("✅ 优雅停机完成");
     }
 }

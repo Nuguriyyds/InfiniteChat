@@ -1,5 +1,5 @@
 server:
-  port: 10010
+  port: 10010 # 🌟 记住这个端口！Postman 全靠它了！
 
 spring:
   main:
@@ -8,40 +8,46 @@ spring:
     name: Gateway
   cloud:
     nacos:
+      # 🌟 修复：Nacos 层级语法修正
+      server-addr: 127.0.0.1:18375
+      username: nacos
+      password: Xp4#tG7!vQ
       discovery:
-        # 你的 Nacos 地址
-        server-addr: 127.0.0.1:18375
-        username: nacos
-        password: Xp4#tG7!vQ
+        ip: 127.0.0.1
     gateway:
-      # 跨域全局配置 (极其重要，前端连网关必配)
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
           '[/**]':
-            allowedOriginPatterns: "*" # 允许所有来源跨域
-            allowedMethods: "*"        # 允许所有 HTTP 方法 (GET, POST, PATCH 等)
-            allowedHeaders: "*"        # 允许携带所有头信息 (包括 Authorization)
-            allowCredentials: true     # 允许携带 Cookie
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
             maxAge: 36000
 
-      # 🌟 核心路由表 (动态路由分发)
       routes:
-        # 1. 登录注册/用户服务路由
+        # 1. 🔑 认证服务路由
         - id: AuthenticationService
-          uri: lb://AuthenticationService # lb 代表 LoadBalance (负载均衡)，去 Nacos 找这个名字的服务
+          uri: lb://AuthenticationService
           predicates:
-            - Path=/api/v1/user/** # 只要是 /api/v1/user/ 开头的请求，全转给 Auth 服务
+            - Path=/api/v1/user/**
 
-        # 2. 实时通讯/聊天服务路由 (为你的 Netty 模块预留)
-        - id: RealTimeCommunicationService
+        # 2. 📩 消息业务路由
+        - id: MessagingService
+          uri: lb://MessagingService
+          predicates:
+            - Path=/api/message/**
+
+        # 3. 🚀 RTC - WebSocket 长连接专线 (🌟 精确匹配，必须放在上面！)
+        # 直接怼到 9101 端口，完美避开 Nacos 的 8083 盲区
+        - id: NettyWebSocketRouter
+          uri: ws://127.0.0.1:9101
+          predicates:
+            - Path=/api/v1/chat/message
+
+        # 4. 🌐 RTC - HTTP 接口路由 (🌟 模糊匹配，给 SysController 用的)
+        # 去 Nacos 找 8083 端口
+        - id: RTC_Http_Router
           uri: lb://RealTimeCommunicationService
           predicates:
-            - Path=/api/v1/message/** # 比如获取历史消息、离线消息等接口
-
-        # 3. WebSocket 长连接转发预留 (将来连 Netty 用的)
-        # 注意：WebSocket 的协议头是 ws:// 或者 lb:ws://
-        - id: NettyWebSocketRouter
-          uri: lb:ws://RealTimeCommunicationService
-          predicates:
-            - Path=/api/v1/chat/message   # 匹配你 Netty 里的 WebSocket 路径
+            - Path=/api/v1/chat/**

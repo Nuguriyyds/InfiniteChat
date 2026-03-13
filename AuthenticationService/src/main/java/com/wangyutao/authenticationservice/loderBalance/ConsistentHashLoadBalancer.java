@@ -21,7 +21,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
 
 
     @Override
-    public ServiceInstance select(List<ServiceInstance> instances, String userId) {
+    public ServiceInstance select(List<ServiceInstance> instances, Long userId) {
         if (instances == null || instances.isEmpty()) {
             log.warn("❌ 当前没有可用的 Netty 实例！");
             return null;
@@ -45,7 +45,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
         }
 
         // 🌟 4. 路由逻辑：寻找哈希环上的对应节点
-        int hash = getHash(userId);
+        int hash = getHash(String.valueOf(userId));
         // 得到大于等于该 Hash 值的右侧红黑树
         SortedMap<Integer, ServiceInstance> tailMap = hashRing.tailMap(hash);
 
@@ -89,7 +89,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
             hash ^= hash >> 17;
             hash += hash << 5;
             if (hash < 0) {
-                hash = Math.abs(hash); // 简化了位运算取绝对值，更加直观
+                hash = hash & 0x7FFFFFFF; // 简化了位运算取绝对值，更加直观
             }
         }
         return hash;

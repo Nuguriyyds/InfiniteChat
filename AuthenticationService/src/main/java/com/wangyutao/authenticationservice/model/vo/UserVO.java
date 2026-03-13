@@ -1,6 +1,8 @@
 package com.wangyutao.authenticationservice.model.vo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,7 +13,8 @@ public class UserVO implements Serializable {
     /**
      * id
      */
-    private String userId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long userId;
 
     /**
      * 用户昵称

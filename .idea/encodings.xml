@@ -9,10 +9,16 @@
     <file url="file://$PROJECT_DIR$/Common/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Gateway/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Messaging/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/Messaging/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/RealTimeCommunication/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/RealTimeCommunication/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Service/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/Service/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/contact/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/contact/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/moment/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/moment/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

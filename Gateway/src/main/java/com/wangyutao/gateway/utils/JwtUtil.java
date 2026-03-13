@@ -11,7 +11,7 @@ public class JwtUtil {
 
     // 🚨 极度重要警告：这里的秘钥必须和你 AuthenticationService 里签发 Token 用的秘钥【一模一样】！
     // 请把你生成 Token 用的那个 ConfigEnum.TOKEN_SECRET_KEY.getValue() 的真实字符串复制填到这里。
-    private static final String SECRET_KEY = "goat";
+    private static final String SECRET_KEY = "infinitechat_secret_key_2026_safe_and_secure_for_im_system_64_bits";
 
     /**
      * 解析 JWT Token
@@ -27,7 +27,7 @@ public class JwtUtil {
         try {
             // 使用 JJWT 解析 Token，纯 CPU 无状态验签
             return Jwts.parserBuilder()
-                    .setSigningKey(SECRET_KEY.getBytes()) // 设置验签秘钥
+                    .setSigningKey(SECRET_KEY.getBytes(java.nio.charset.StandardCharsets.UTF_8)) // 设置验签秘钥
                     .build()
                     .parseClaimsJws(token)
                     .getBody();

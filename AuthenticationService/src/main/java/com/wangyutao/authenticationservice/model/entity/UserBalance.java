@@ -18,7 +18,7 @@ public class UserBalance {
      * 用户ID
      */
     @TableId("user_id")
-    private String userId;
+    private Long userId;
 
     /**
      * 余额

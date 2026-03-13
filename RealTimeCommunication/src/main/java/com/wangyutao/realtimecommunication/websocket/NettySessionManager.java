@@ -1,11 +1,13 @@
 package com.wangyutao.realtimecommunication.websocket;
 
-
 import io.netty.channel.Channel;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -13,13 +15,20 @@ import java.util.concurrent.ConcurrentMap;
 @Slf4j
 @Component
 public class NettySessionManager {
-    // 在 NettySessionManager.java 中添加这行
-    private final ConcurrentMap<String, Channel> userChannelMap = new ConcurrentHashMap<>();
+
+    private final ConcurrentMap<Long, Channel> userChannelMap = new ConcurrentHashMap<>();
+
+    @Resource
+    private StringRedisTemplate redisTemplate;
+
+    // 🌟 1. 注入当前节点的动态 ID（必须和 Handler 里注册路由时用的一模一样）
+    @Value("${im.node.id:NODE_1}")
+    private String localNodeId;
 
     /**
      * 1. 用户上线：绑定 UserId 和 Channel
      */
-    public void add(String userId, Channel channel) {
+    public void add(Long userId, Channel channel) {
         if (userId != null && channel != null) {
             userChannelMap.put(userId, channel);
             log.info("✅ 用户上线登记成功, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
@@ -29,34 +38,44 @@ public class NettySessionManager {
     /**
      * 2. 根据 UserId 获取 Channel (用于私聊/系统推送精准找人)
      */
-    public Channel getChannel(String userId) {
+    public Channel getChannel(Long userId) {
         if (userId == null) return null;
         return userChannelMap.get(userId);
     }
 
     /**
-     * 3. 根据 UserId 移除映射 (通常用于异地登录挤下线)
+     * 3. 根据 UserId 移除映射 (通常只清理本地内存)
      */
-    public void remove(String userId) {
+    public void remove(Long userId) {
         if (userId != null) {
             userChannelMap.remove(userId);
-            log.info("⛔ 移除用户会话, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
+            log.info("⛔ 移除用户本地会话, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
         }
     }
 
     /**
-     * 4. 根据 Channel 移除映射 (核心神技：利用便利贴 O(1) 极速撕下)
-     * 完美适用于各种断网、主动退出、心跳超时场景，彻底告别 for 循环遍历！
+     * 4. 🌟 终极改造：根据 Channel 移除映射（防误杀版）
      */
     public void remove(Channel channel) {
         if (channel == null) return;
 
         // 从 Channel 身上提取我们在鉴权时贴好的 UserId 便利贴
-        String userId = channel.attr(WebSocketTokenAuthHandler.USER_ID_KEY).get();
+        Long userId = channel.attr(WebSocketTokenAuthHandler.USER_ID_KEY).get();
         if (userId != null) {
+            // L1: 清理本地内存
             userChannelMap.remove(userId);
-            log.info("🔌 连接断开清理成功, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
+
+            // L2: 清理全局路由 (🌟 核心防误杀逻辑)
+            String routeKey = "im:route:" + userId;
+            String registeredNode = redisTemplate.opsForValue().get(routeKey);
+
+            // 只有当 Redis 里记录的节点依然是本节点时，才允许删除！
+            if (localNodeId.equals(registeredNode)) {
+                redisTemplate.delete(routeKey);
+                log.info("🔌 连接断开，全局路由清理成功, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
+            } else {
+                log.info("🔌 连接断开，但全局路由已被其他节点接管，跳过清理, userId: {}, 接管节点: {}", userId, registeredNode);
+            }
         }
     }
-
 }

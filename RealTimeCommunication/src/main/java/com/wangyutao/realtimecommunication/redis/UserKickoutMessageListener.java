@@ -1,6 +1,5 @@
 package com.wangyutao.realtimecommunication.redis;
 
-
 import com.wangyutao.realtimecommunication.websocket.NettySessionManager;
 import io.netty.channel.Channel;
 import lombok.RequiredArgsConstructor;
@@ -17,41 +16,52 @@ import java.nio.charset.StandardCharsets;
 public class UserKickoutMessageListener implements MessageListener {
 
     private final NettySessionManager sessionManager;
+
+    // 🌟 规范前缀，抽成常量更优雅
+    private static final String ROUTE_PREFIX = "im:route:";
+
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        // 1. 从广播中解析出要被踢下线的 userId (例如："netty:server:888")
-        // 注意：这里要看你 AuthenticationService 里发的到底是什么格式的字符串
-        // 拿到原始消息体，例如："Nacos:888"
-        String messageBody = new String(message.getBody(), StandardCharsets.UTF_8);
-        log.info("📢 收到 Redis 踢人广播，目标: {}", messageBody);
+        try {
+            // 1. 拿到原始消息体，例如："im:route:888" 或 "888"
+            String messageBody = new String(message.getBody(), StandardCharsets.UTF_8).trim();
+            log.info("📢 收到 Redis 踢人广播，原始报文: {}", messageBody);
 
-        // 假设 messageBody 里包含了 userId，比如直接传了 "888" 或者需要你拆分一下
-        // 这里以直接收到 userId 为例：
-        String targetUserId = extractUserId(messageBody);
+            // 2. 🌟 调用你写的优质辅助方法，剥离出干净的 userId 字符串
+            String userIdStr = extractUserId(messageBody);
 
-        if (targetUserId != null) {
-            // 2. 去花名册里查，这个倒霉蛋连在咱们这台机器上吗？
+            // 3. 强转为 Long（如果传过来的不是数字，这里会被 catch 住，不会让程序崩溃）
+            Long targetUserId = Long.valueOf(userIdStr);
+
+            // 4. 去本地花名册里查，这个倒霉蛋连在咱们这台机器上吗？
             Channel channel = sessionManager.getChannel(targetUserId);
 
             if (channel != null) {
-                // 3. 抓到人了！直接断开 TCP 连接
+                // 5. 抓到人了！直接断开 TCP 连接
                 log.warn("💥 正在执行跨服务物理踢出，切断用户 [{}] 的连接！", targetUserId);
                 channel.close();
-                // sessionManager.remove(channel) 会在 channelInactive 里自动触发，所以这里不用重复写
+                // 💡 架构师注：channel.close() 之后，Netty 会自动触发 channelInactive 事件，
+                // 从而自动调用 sessionManager.remove()，本地内存和 Redis 全局路由都会被清理得干干净净！
             } else {
-                log.debug("用户 [{}] 不在当前 Netty 节点，忽略该广播。", targetUserId);
+                log.debug("🎯 目标用户 [{}] 不在当前 Netty 节点，忽略该广播。", targetUserId);
             }
+
+        } catch (NumberFormatException e) {
+            log.error("❌ 踢人广播解析异常：userId 格式非法，无法转换为 Long！", e);
+        } catch (Exception e) {
+            log.error("❌ 处理踢人广播时发生未知异常", e);
         }
     }
 
-    // 辅助方法：根据你实际发送的格式提取 userId
+    /**
+     * 辅助方法：智能提取 userId
+     * 兼容直接发 "888" 或发 "im:route:888" 的情况
+     */
     private String extractUserId(String messageBody) {
-        // 如果你的发送代码是: redisTemplate.convertAndSend(TOPIC, "netty_server_" + userId)
-        // 那你这里就需要把前缀去掉，提取出真正的 888
-        String prefix = "Nacos:"; // 对应你配置里的 ConfigEnum.NETTY_SERVER_HEAD
-        if (messageBody.startsWith(prefix)) {
-            return messageBody.substring(prefix.length());
+        if (messageBody.startsWith(ROUTE_PREFIX)) {
+            // 砍掉前缀，留下纯数字
+            return messageBody.substring(ROUTE_PREFIX.length());
         }
-        return messageBody;
+        return messageBody; // 如果本来就没前缀，直接返回
     }
 }

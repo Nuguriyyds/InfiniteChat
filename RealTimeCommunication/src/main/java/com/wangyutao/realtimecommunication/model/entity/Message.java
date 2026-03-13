@@ -1,5 +1,7 @@
 package com.wangyutao.realtimecommunication.model.entity;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,27 +11,28 @@ import java.util.List;
 @Accessors(chain = true)
 public class Message {
 
-    protected String sessionId;
+    private String sessionId;
 
-    protected List<Long> receiveUserIds;
+    private List<Long> receiveUserIds; // 🌟 这个字段在群聊广播时很有用
 
-    protected String sendUserId;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long sendUserId; // 🌟 回归 Long
 
-    protected String avatar;
+    private String avatar;
 
-    protected String userName;
+    private String userName;
 
-    protected Integer type;
+    private Integer type;
 
-    protected String messageId;
+    private String messageId; // 🌟 保持 String，因为带 msg_ 前缀
 
-    protected Integer sessionType;
+    private Integer sessionType;
 
-    protected String sessionName;
+    private String sessionName;
 
-    protected String sessionAvatar;
+    private String sessionAvatar;
 
-    protected String createdAt;
+    private String createdAt;
 
-    protected Object body;
+    private Object body; // 具体的文本、图片链接等
 }

@@ -2,9 +2,11 @@ package com.wangyutao.realtimecommunication.websocket;
 
 import cn.hutool.core.net.url.UrlQuery;
 import com.wangyutao.realtimecommunication.utils.JwtUtil; // 导入你搬过来的 JwtUtil
+import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AttributeKey;
@@ -19,7 +21,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class WebSocketTokenAuthHandler extends ChannelInboundHandlerAdapter {
 
-    public static final AttributeKey<String> USER_ID_KEY = AttributeKey.valueOf("USER_ID");
+    public static final AttributeKey<Long> USER_ID_KEY = AttributeKey.valueOf("USER_ID");
 
     // 注入 Redis，注意这里不要用 @Autowired，如果是单例组件可以通过构造器注入，或者在 NettyServer 组装时传入
     // private final StringRedisTemplate redisTemplate;
@@ -45,9 +47,10 @@ public class WebSocketTokenAuthHandler extends ChannelInboundHandlerAdapter {
             try {
                 // 🌟 2. 极致性能：纯 CPU 解析校验 JWT，不需要查 Redis！
                 // 如果 Token 过期或被篡改，parse() 底层会抛异常，直接进入 catch 块
-                String userId = JwtUtil.parse(token).getSubject();
+                String userIdStr = JwtUtil.parse(token).getSubject();
+                Long userId = Long.valueOf(userIdStr);
 
-                if (userId == null || userId.trim().isEmpty()) {
+                if (userId == null) {
                     throw new RuntimeException("Token 格式错误，无法解析 UserId");
                 }
 
@@ -61,14 +64,21 @@ public class WebSocketTokenAuthHandler extends ChannelInboundHandlerAdapter {
             } catch (Exception e) {
                 // 捕获到过期、篡改等异常，直接切断
                 log.warn("❌ 鉴权失败：Token 不合法或已过期");
-                ctx.channel().writeAndFlush(new io.netty.handler.codec.http.DefaultFullHttpResponse(
-                        request.protocolVersion(), HttpResponseStatus.UNAUTHORIZED));
-                ctx.close();
+                sendErrorAndClose(ctx, request, HttpResponseStatus.UNAUTHORIZED);
                 return;
             }
         }
 
         // 传递给下一个 Handler (比如 WebSocketServerProtocolHandler)
         super.channelRead(ctx, msg);
+    }
+
+    /**
+     * 🌟 封装优雅的错误响应与断开逻辑
+     */
+    private void sendErrorAndClose(ChannelHandlerContext ctx, FullHttpRequest request, HttpResponseStatus status) {
+        DefaultFullHttpResponse response = new DefaultFullHttpResponse(request.protocolVersion(), status);
+        // 必须等 401 响应彻底写入网卡后，再安全关闭 TCP 连接，防止前端收到 Connection Reset
+        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/message/push")
+@RequestMapping("/api/v1/chat/push")
 @RequiredArgsConstructor
 public class PushController {
 
@@ -24,7 +24,7 @@ public class PushController {
      */
     @PostMapping("/newSession/{userId}")
     public Result pushNewSession(
-            @PathVariable("userId") String userId,
+            @PathVariable("userId") Long userId,
             @RequestBody NewSessionNotification notification) {
         nettyMessageService.sendNewSessionNotification(notification, userId);
         return ResultGenerator.genSuccessResult("New session notification pushed.");
@@ -35,7 +35,7 @@ public class PushController {
      */
     @PostMapping("/friendApplication/{userId}")
     public Result pushFriendApplication(
-            @PathVariable("userId") String userId,
+            @PathVariable("userId") Long userId,
             @RequestBody FriendApplicationNotification notification) {
         nettyMessageService.sendFriendApplicationNotification(notification, userId);
         return ResultGenerator.genSuccessResult("Friend application notification pushed.");
@@ -46,7 +46,7 @@ public class PushController {
      */
     @PostMapping("/newGroupSession/{userId}")
     public Result pushNewGroupSession(
-            @PathVariable("userId") String userId,
+            @PathVariable("userId") Long userId,
             @RequestBody NewGroupSessionNotification notification) {
         nettyMessageService.sendNewGroupSessionNotification(notification, userId);
         return ResultGenerator.genSuccessResult("New Group session notification pushed.");

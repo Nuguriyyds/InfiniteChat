@@ -1,8 +1,6 @@
 package com.wangyutao.realtimecommunication.config;
 
-
 import com.wangyutao.realtimecommunication.redis.UserKickoutMessageListener;
-import com.wangyutao.realtimecommunication.redis.UserOfflineListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -14,8 +12,7 @@ public class RedisSubscriberConfig {
 
     @Bean
     public RedisMessageListenerContainer container(RedisConnectionFactory connectionFactory,
-                                                   UserKickoutMessageListener kickoutListener,
-                                                   UserOfflineListener offlineListener) {
+                                                   UserKickoutMessageListener kickoutListener) { // ❌ 删除了 offlineListener 注入
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
 
@@ -23,9 +20,9 @@ public class RedisSubscriberConfig {
         String kickoutTopic = "userLogout";
         container.addMessageListener(kickoutListener, new PatternTopic(kickoutTopic));
 
-        // 🌟 2. 监听 Netty 自己的“掉线”广播 (目标：清理 Redis 里的全局路由)
-        String offlineTopic = "im:user:offline";
-        container.addMessageListener(offlineListener, new PatternTopic(offlineTopic));
+        // ❌ 删除了 offlineTopic 的监听！
+        // 💡 架构师注：现在 Netty 节点在断开连接时，会直接通过 NettySessionManager
+        // 精准擦除 Redis 里的 im:route:{userId}，再也不需要全网大喇叭广播了，性能拉满！
 
         return container;
     }

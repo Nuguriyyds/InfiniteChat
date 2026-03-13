@@ -26,7 +26,7 @@ public class ServiceInstanceUtil {
     // 只要你刚才写的 ConsistentHashLoadBalancer 上加了 @Component，Spring 就会自动把它塞进来
     private final LoadBalancer loadBalancer;
 
-    public String getServiceInstance(String userId) {
+    public String getServiceInstance(Long userId) {
         // 1. 从 Nacos 动态拉取当前所有存活的 Netty 实例列表
         List<ServiceInstance> instances = discoveryClient.getInstances(ConfigEnum.NETTY_SERVER.getValue());
 
@@ -46,7 +46,7 @@ public class ServiceInstanceUtil {
         String redisKey = ConfigEnum.NETTY_SERVER_HEAD.getValue() + userId;
         String nettyUri = instance.getUri().toString();
 
-        redisTemplate.opsForValue().set(redisKey, nettyUri, TimeOutEnum.TOKEN_TIME_OUT.getTimeOut(), TimeUnit.DAYS);
+        // redisTemplate.opsForValue().set(redisKey, nettyUri, TimeOutEnum.TOKEN_TIME_OUT.getTimeOut(), TimeUnit.DAYS);
         log.info("✅ 用户 [{}] 被分配至 Netty 节点: {}", userId, nettyUri);
 
         // 返回主机 IP 给 UserServiceImpl 拼接完整 WebSocket 地址

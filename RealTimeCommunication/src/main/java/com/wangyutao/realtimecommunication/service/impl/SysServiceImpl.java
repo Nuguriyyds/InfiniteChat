@@ -21,7 +21,7 @@ public class SysServiceImpl implements SysService {
     @Override
     public OnlineUserVo getOnlineUser() {
         // 1. 获取安全的 Map (Java 8 写法)
-        ConcurrentMap<String, Channel> userChannelMap = sessionManager.getUserChannelMap();
+        ConcurrentMap<Long, Channel> userChannelMap = sessionManager.getUserChannelMap();
 
         // 2. 提取并组装前端安全的数据格式 (剔除庞大的 Channel 实例)
         List<OnlineUserVo.OnlineUserInfo> userInfoList = userChannelMap.entrySet().stream()

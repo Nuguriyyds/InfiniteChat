@@ -7,5 +7,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class LogOutData {
 
-    private String userUuid;
+    private Long userUuid;
 }

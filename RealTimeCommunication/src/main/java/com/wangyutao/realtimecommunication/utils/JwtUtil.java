@@ -24,7 +24,7 @@ public final class JwtUtil {
                 .setSubject(id)
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, ConfigEnum.TOKEN_SECRET_KEY.getValue())
+                .signWith(SignatureAlgorithm.HS512, ConfigEnum.TOKEN_SECRET_KEY.getValue().getBytes(java.nio.charset.StandardCharsets.UTF_8))
                 .compact();
     }
 
@@ -38,7 +38,7 @@ public final class JwtUtil {
         }
         try {
             return Jwts.parser()
-                    .setSigningKey(ConfigEnum.TOKEN_SECRET_KEY.getValue())
+                    .setSigningKey(ConfigEnum.TOKEN_SECRET_KEY.getValue().getBytes(java.nio.charset.StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody();
         } catch (JwtException e) {

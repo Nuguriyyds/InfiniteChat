@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/sys")
+@RequestMapping("/api/v1/chat/sys")
 public class SysController {
 
     // sysService 系统服务

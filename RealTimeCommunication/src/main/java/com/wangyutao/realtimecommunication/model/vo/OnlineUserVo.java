@@ -1,5 +1,7 @@
 package com.wangyutao.realtimecommunication.model.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -24,7 +26,9 @@ public class OnlineUserVo implements Serializable {
     @Accessors(chain = true)
     public static class OnlineUserInfo implements Serializable {
         // 用户 ID
-        private String userId;
+
+        @JsonSerialize(using = ToStringSerializer.class) // 防止 JS 精度丢失
+        private Long userId;
 
         // 对应的 Netty 管道短 ID (前端排查日志用的)
         private String channelShortId;

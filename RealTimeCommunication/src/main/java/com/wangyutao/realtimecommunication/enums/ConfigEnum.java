@@ -14,7 +14,7 @@ public enum ConfigEnum {
     SMS_ACCESS_KEY_SECRET("smsAccessKeySecret","rGp3V1PL0i72DrdDnwtDXUa0xlLZbi"),
     SMS_SIG_NAME("smsSigName","Zzw"),
     SMS_TEMPLATE_CODE("smsTemplateCode","SMS_468395208"),
-    TOKEN_SECRET_KEY("tokenSecretKey","goat"),
+    TOKEN_SECRET_KEY("tokenSecretKey","infinitechat_secret_key_2026_safe_and_secure_for_im_system_64_bits"),
     PASSWORD_SALT("passwordSalt","goat"),
     WX_STATE("wxState","goat"),
     WORKED_ID("workedId","1"),

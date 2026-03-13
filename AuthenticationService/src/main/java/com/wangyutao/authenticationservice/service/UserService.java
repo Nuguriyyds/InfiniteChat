@@ -12,7 +12,7 @@ public interface UserService {
 
     void userRegister(UserRegisterRequest userRegisterRequest) throws InterruptedException;
 
-    void updateAvatar(String id, UserUpdateAvatarRequest request);
+    void updateAvatar(Long id, UserUpdateAvatarRequest request);
 
     UploadUrlResponse getUploadUrl(String fileName) throws Exception;
 
@@ -20,6 +20,6 @@ public interface UserService {
 
     void userLogout(UserLogOutRequest userLogOutRequest);
 
-    UserVO refreshToken(String userId, String clientRefreshToken);
+    UserVO refreshToken(Long userId, String clientRefreshToken);
 
 }
