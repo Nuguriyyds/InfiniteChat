@@ -21,12 +21,13 @@
     @RequiredArgsConstructor
     public class NettyMessageService {
 
-        // 🌟 抛弃单机的 SessionManager，拥抱分布式的 Redis 和 MQ！
         private final StringRedisTemplate redisTemplate;
         private final RocketMQTemplate rocketMQTemplate;
 
+        private static final String NOTIFY_TOPIC = "IM_NOTIFY";
+
         /**
-         * 🌟 终极推送引擎：将任意数据包装成标准件，利用 MQ 精准制导！
+         * 通知类推送：走独立的 IM_NOTIFY topic，与聊天消息隔离
          */
         public void sendPush(Integer pushTypeCode, Object data, Long receiveUserId) {
             if (receiveUserId == null || data == null) {
@@ -34,39 +35,28 @@
                 return;
             }
 
-            // 1. 查全局字典：目标用户究竟连在哪台机器上？
             String targetNodeId = redisTemplate.opsForValue().get("im:route:" + receiveUserId);
+            String mqTag = (targetNodeId == null || targetNodeId.isEmpty()) ? "OFFLINE" : targetNodeId;
 
-            if (targetNodeId == null || targetNodeId.isEmpty()) {
-                // 用户彻底离线，或者 App 处于后台被杀
-                // 💡 架构师注：对于好友申请等重要通知，这里可以调用极光推送/苹果 APNs 发送离线手机弹窗
-                log.debug("⚠️ 用户 [{}] 当前不在线，走离线拉取/APNs逻辑。", receiveUserId);
-                return;
-            }
-
-            // 2. 包装成前端认识的格式
             MessageDTO messageDTO = new MessageDTO().setType(pushTypeCode).setData(data);
             String finalJsonToFrontend = JSONUtil.toJsonStr(messageDTO);
 
-            // 🌟 3. 套上网关标准件纸箱！把收件人和包裹内容装进去
             GatewayPushPacket packet = new GatewayPushPacket(
                     java.util.Collections.singletonList(receiveUserId),
                     finalJsonToFrontend
             );
 
-            // 4. 将标准件转为 JSON 扔进 MQ
             org.springframework.messaging.Message<String> mqMessage = MessageBuilder
                     .withPayload(JSONUtil.toJsonStr(packet)).build();
 
-            // 💥 魔法在这里：无论这个 HTTP 请求打到了哪台机器，这条 MQ 最终都会精准掉落到 targetNodeId 的内存里！
-            rocketMQTemplate.asyncSend("IM_CHAT:" + targetNodeId, mqMessage, new org.apache.rocketmq.client.producer.SendCallback() {
+            rocketMQTemplate.asyncSend(NOTIFY_TOPIC + ":" + mqTag, mqMessage, new org.apache.rocketmq.client.producer.SendCallback() {
                 @Override
                 public void onSuccess(org.apache.rocketmq.client.producer.SendResult sendResult) {
-                    log.info("🚀 成功将实时通知扔进 MQ，目标机器: {}, 用户: {}", targetNodeId, receiveUserId);
+                    log.info("通知推送投递成功, topic={}, tag={}, 用户={}", NOTIFY_TOPIC, mqTag, receiveUserId);
                 }
                 @Override
                 public void onException(Throwable e) {
-                    log.error("❌ MQ 投递通知失败, 用户: {}", receiveUserId, e);
+                    log.error("通知推送投递失败, 用户: {}", receiveUserId, e);
                 }
             });
         }

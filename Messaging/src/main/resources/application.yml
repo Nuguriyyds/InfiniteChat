@@ -6,59 +6,63 @@ spring:
     name: MessagingService
   cloud:
     nacos:
-      server-addr: 127.0.0.1:18375
+      server-addr: 172.30.233.168:18375
       username: nacos
-      password: Xp4#tG7!vQ
+      password: nacos
       discovery:
-        ip: 127.0.0.1
+        ip: 172.31.130.141
   redis:
-    host: 127.0.0.1
-    port: 59000
+    host: 172.30.233.168
+    port: 6399
     password: e65K4t8w2
+    lettuce:
+      pool:
+        max-active: 32
+        max-idle: 16
+        min-idle: 8
+        max-wait: 200ms
 
   # 🌟 新增：MySQL 数据库配置 (用于 im_message 聊天记录落盘)
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://172.30.233.168:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: gK3T9n%q2M@j7Z4
     hikari:
-      # 设置最大连接池大小
       maximum-pool-size: 30
-      # 设置最小空闲连接数
       minimum-idle: 10
-      # 设置连接池初始化失败时的超时时间
       initialization-fail-timeout: 10000
-      # 设置连接池的最大空闲时间
-      idle-timeout: 30000
-      # 设置连接池中连接的最大生命周期
-      max-lifetime: 60000
-      # 设置连接池的连接超时时间
-      connection-timeout: 30000
-      # 设置连接池的最大等待时间
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-timeout: 5000
       validation-timeout: 3000
-      # 配置连接池验证SQL（根据数据库选择合适的SQL）
       connection-test-query: SELECT 1
-      # 设置连接池的池化管理名称
       pool-name: HikariCP
   jmx:
     enabled: true
 
 minio:
-  url: http://127.0.0.1:9000
+  url: http://172.30.233.168:9000
   access-key: minioadmin
   secret-key: minioadmin
 
 # 🌟 新增：RocketMQ 配置
 rocketmq:
-  name-server: 127.0.0.1:9876 # 替换为你真实的 RocketMQ NameServer 地址
+  name-server: 172.30.233.168:9876 # 替换为你真实的 RocketMQ NameServer 地址
   producer:
-    group: im-message-producer-group # 核心聊天消息发送引擎专用的生产者组
-    send-message-timeout: 3000
+    group: im-message-producer-group # 默认 RocketMQTemplate：普通发送
+    send-message-timeout: 1000
+  # 抢红包事务专用生产者组（由 RedPacketTxRocketMQTemplate + @ExtRocketMQTemplateConfiguration 使用）
+  # 官方无 rocketmq.transaction-producer-group 绑定项，勿与旧教程混用
+  red-packet-tx-producer-group: im-red-packet-receive-tx-group
 
 # 🌟 新增：Mybatis-Plus 配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml # XML 映射文件路径
   configuration:
     map-underscore-to-camel-case: true # 开启驼峰命名自动映射
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 开启控制台打印 SQL，方便你今晚排查落库 Bug！
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl # 开启控制台打印 SQL，方便你今晚排查落库 Bug！
+
+feign:
+  circuitbreaker:
+    enabled: true

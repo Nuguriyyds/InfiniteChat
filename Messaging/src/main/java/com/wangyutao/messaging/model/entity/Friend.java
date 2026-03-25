@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Data
 @Accessors(chain = true)
-@TableName("im_friend")
+@TableName("contact")
 public class Friend {
 
     @TableId

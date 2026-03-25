@@ -1,0 +1,45 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: OfflineService
+  cloud:
+    nacos:
+      server-addr: 172.30.233.168:18375
+      username: nacos
+      password: nacos
+      discovery:
+        ip: 172.31.130.141
+  redis:
+    host: 172.30.233.168
+    port: 6399
+    password: e65K4t8w2
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.30.233.168:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: gK3T9n%q2M@j7Z4
+    hikari:
+      maximum-pool-size: 30
+      minimum-idle: 10
+      initialization-fail-timeout: 10000
+      idle-timeout: 30000
+      max-lifetime: 60000
+      connection-timeout: 30000
+      validation-timeout: 3000
+      connection-test-query: SELECT 1
+      pool-name: HikariCP
+
+rocketmq:
+  name-server: 172.30.233.168:9876
+  producer:
+    group: im-offline-producer-group
+    send-message-timeout: 3000
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

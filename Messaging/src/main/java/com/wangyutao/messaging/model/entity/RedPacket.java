@@ -33,7 +33,7 @@ public class RedPacket {
      * 会话ID（单聊或群聊）
      */
     @TableField("session_id")
-    private Long sessionId;
+    private String sessionId;
 
     /**
      * 红包封面文案
@@ -83,6 +83,4 @@ public class RedPacket {
     @TableField("created_at")
     private LocalDateTime createdAt;
 
-    @TableField("version")
-    private Integer version;
 }

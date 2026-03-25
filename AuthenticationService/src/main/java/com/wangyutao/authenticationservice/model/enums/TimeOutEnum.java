@@ -6,7 +6,7 @@ import lombok.Getter;
 public enum TimeOutEnum {
     TOKEN_TIME_OUT("token time out(day)",3),
     JWT_TIME_OUT("token time out(day)",3),
-    CODE_TIME_OUT("code time out(minute)",500000);
+    CODE_TIME_OUT("code time out(minute)",5);
 
     private String name;
 

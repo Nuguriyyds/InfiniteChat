@@ -18,7 +18,7 @@ public class NettySessionManager {
 
     private final ConcurrentMap<Long, Channel> userChannelMap = new ConcurrentHashMap<>();
 
-    @Resource
+    @Resource(name = "stringRedisTemplate")
     private StringRedisTemplate redisTemplate;
 
     // 🌟 1. 注入当前节点的动态 ID（必须和 Handler 里注册路由时用的一模一样）
@@ -59,22 +59,24 @@ public class NettySessionManager {
     public void remove(Channel channel) {
         if (channel == null) return;
 
-        // 从 Channel 身上提取我们在鉴权时贴好的 UserId 便利贴
         Long userId = channel.attr(WebSocketTokenAuthHandler.USER_ID_KEY).get();
         if (userId != null) {
-            // L1: 清理本地内存
-            userChannelMap.remove(userId);
+            // CAS remove: only delete if the map still holds THIS exact channel instance
+            boolean removed = userChannelMap.remove(userId, channel);
 
-            // L2: 清理全局路由 (🌟 核心防误杀逻辑)
-            String routeKey = "im:route:" + userId;
-            String registeredNode = redisTemplate.opsForValue().get(routeKey);
+            if (removed) {
+                // Local mapping was ours, now check if we should also clean the global route
+                String routeKey = "im:route:" + userId;
+                String registeredNode = redisTemplate.opsForValue().get(routeKey);
 
-            // 只有当 Redis 里记录的节点依然是本节点时，才允许删除！
-            if (localNodeId.equals(registeredNode)) {
-                redisTemplate.delete(routeKey);
-                log.info("🔌 连接断开，全局路由清理成功, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
+                if (localNodeId.equals(registeredNode)) {
+                    redisTemplate.delete(routeKey);
+                    log.info("连接断开，全局路由清理成功, userId: {}, 当前在线总人数: {}", userId, userChannelMap.size());
+                } else {
+                    log.info("连接断开，全局路由已被其他节点接管，跳过清理, userId: {}, 接管节点: {}", userId, registeredNode);
+                }
             } else {
-                log.info("🔌 连接断开，但全局路由已被其他节点接管，跳过清理, userId: {}, 接管节点: {}", userId, registeredNode);
+                log.info("连接断开，但本地映射已被新连接覆盖，跳过清理, userId: {}", userId);
             }
         }
     }

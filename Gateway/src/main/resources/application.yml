@@ -6,15 +6,25 @@ spring:
     web-application-type: reactive
   application:
     name: Gateway
+  redis:
+    host: 172.30.233.168
+    port: 6399
+    password: e65K4t8w2
+    database: 0
   cloud:
     nacos:
       # 🌟 修复：Nacos 层级语法修正
-      server-addr: 127.0.0.1:18375
+      server-addr: 172.30.233.168:18375
       username: nacos
-      password: Xp4#tG7!vQ
+      password: nacos
       discovery:
-        ip: 127.0.0.1
+        ip: 172.31.130.141
     gateway:
+      httpclient:
+        pool:
+          max-connections: 1000
+          acquire-timeout: 3000
+        connect-timeout: 2000
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
@@ -37,6 +47,24 @@ spring:
           uri: lb://MessagingService
           predicates:
             - Path=/api/message/**
+
+        # 2b. 📬 离线消息（拉取 / 未读 / 已读）
+        - id: OfflineService
+          uri: lb://OfflineService
+          predicates:
+            - Path=/api/offline/**
+
+        # 2c. 👥 通讯录（好友等，spring.application.name=ContactService）
+        - id: ContactService
+          uri: lb://ContactService
+          predicates:
+            - Path=/api/contact/**
+
+        # 2d. 📷 朋友圈（spring.application.name=moment-service）
+        - id: moment-service
+          uri: lb://moment-service
+          predicates:
+            - Path=/api/moment/**
 
         # 3. 🚀 RTC - WebSocket 长连接专线 (🌟 精确匹配，必须放在上面！)
         # 直接怼到 9101 端口，完美避开 Nacos 的 8083 盲区

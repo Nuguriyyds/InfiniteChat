@@ -1,0 +1,1445 @@
+{
+  "info": {
+    "name": "InfiniteChat 端到端测试",
+    "_postman_id": "infinite-chat-e2e-test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:10010" },
+    { "key": "phoneA", "value": "13800000001" },
+    { "key": "phoneB", "value": "13800000002" },
+    { "key": "phoneC", "value": "13800000003" },
+    { "key": "password", "value": "Test@123456" },
+    { "key": "userIdA", "value": "" },
+    { "key": "userIdB", "value": "" },
+    { "key": "userIdC", "value": "" },
+    { "key": "tokenA", "value": "" },
+    { "key": "tokenB", "value": "" },
+    { "key": "tokenC", "value": "" },
+    { "key": "requestIdAB", "value": "" },
+    { "key": "requestIdAC", "value": "" },
+    { "key": "sessionId", "value": "" },
+    { "key": "groupSessionId", "value": "" },
+    { "key": "momentId", "value": "" },
+    { "key": "clientMsgId1", "value": "" },
+    { "key": "redPacketId", "value": "" },
+    { "key": "groupRedPacketId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "1. 认证模块",
+      "item": [
+        {
+          "name": "1.1 注册用户A",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneA}}\",\n  \"password\": \"{{password}}\",\n  \"code\": \"1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('注册用户A响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  // data 可能是 userId 字符串或对象",
+                  "  if (typeof res.data === 'object' && res.data.userId) {",
+                  "    pm.collectionVariables.set('userIdA', String(res.data.userId));",
+                  "  }",
+                  "}",
+                  "pm.test('注册用户A成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.2 注册用户B",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneB}}\",\n  \"password\": \"{{password}}\",\n  \"code\": \"1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('注册用户B响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  if (typeof res.data === 'object' && res.data.userId) {",
+                  "    pm.collectionVariables.set('userIdB', String(res.data.userId));",
+                  "  }",
+                  "}",
+                  "pm.test('注册用户B成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.3 注册用户C",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneC}}\",\n  \"password\": \"{{password}}\",\n  \"code\": \"1234\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('注册用户C响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  if (typeof res.data === 'object' && res.data.userId) {",
+                  "    pm.collectionVariables.set('userIdC', String(res.data.userId));",
+                  "  }",
+                  "}",
+                  "pm.test('注册用户C成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.4 用户A登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/loginPwd",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "loginPwd"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneA}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('用户A登录响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  pm.collectionVariables.set('tokenA', res.data.Token || res.data.token || '');",
+                  "  pm.collectionVariables.set('userIdA', String(res.data.userId));",
+                  "}",
+                  "pm.test('用户A登录成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.Token || res.data.token).to.not.be.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.5 用户B登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/loginPwd",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "loginPwd"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneB}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.code === 200 && res.data) {",
+                  "  pm.collectionVariables.set('tokenB', res.data.Token || res.data.token || '');",
+                  "  pm.collectionVariables.set('userIdB', String(res.data.userId));",
+                  "}",
+                  "pm.test('用户B登录成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "1.6 用户C登录",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/noToken/loginPwd",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "noToken", "loginPwd"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"{{phoneC}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.code === 200 && res.data) {",
+                  "  pm.collectionVariables.set('tokenC', res.data.Token || res.data.token || '');",
+                  "  pm.collectionVariables.set('userIdC', String(res.data.userId));",
+                  "}",
+                  "pm.test('用户C登录成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. 联系人模块",
+      "item": [
+        {
+          "name": "2.1 A向B发送好友申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": {{userIdB}},\n  \"remark\": \"我是用户A\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('A向B发送好友申请成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.2 B查看待处理申请",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "requests"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('B待处理申请:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data && res.data.length > 0) {",
+                  "  var req = res.data.find(r => r.status === 0);",
+                  "  if (req) {",
+                  "    pm.collectionVariables.set('requestIdAB', String(req.id));",
+                  "  }",
+                  "}",
+                  "pm.test('B查看待处理申请成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.3 B同意好友申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/accept/{{requestIdAB}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "accept", "{{requestIdAB}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('B同意A的好友申请', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.4 A向C发送好友申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/add",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "add"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contactId\": {{userIdC}},\n  \"remark\": \"我是用户A\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('A向C发送好友申请成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.5 C查看待处理申请",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenC}}" },
+              { "key": "X-User-Id", "value": "{{userIdC}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/requests",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "requests"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.code === 200 && res.data && res.data.length > 0) {",
+                  "  var req = res.data.find(r => r.status === 0);",
+                  "  if (req) {",
+                  "    pm.collectionVariables.set('requestIdAC', String(req.id));",
+                  "  }",
+                  "}",
+                  "pm.test('C查看待处理申请成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.6 C同意好友申请",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenC}}" },
+              { "key": "X-User-Id", "value": "{{userIdC}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/accept/{{requestIdAC}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "accept", "{{requestIdAC}}"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('C同意A的好友申请', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "2.7 A查看联系人列表",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "list"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('A的联系人列表包含B和C', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data).to.be.an('array');",
+                  "  pm.expect(res.data.length).to.be.at.least(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "3. 单聊消息",
+      "item": [
+        {
+          "name": "3.0 获取单聊会话ID",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/session/createSingle?userIdA={{userIdA}}&userIdB={{userIdB}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "session", "createSingle"],
+              "query": [
+                { "key": "userIdA", "value": "{{userIdA}}" },
+                { "key": "userIdB", "value": "{{userIdB}}" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('获取单聊会话响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data && res.data.sessionId) {",
+                  "  pm.collectionVariables.set('sessionId', res.data.sessionId);",
+                  "  console.log('sessionId:', res.data.sessionId);",
+                  "}",
+                  "pm.test('获取单聊会话ID成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.1 A给B发消息",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientMsgId\": \"test-single-msg-001\",\n  \"sessionId\": \"{{sessionId}}\",\n  \"sessionType\": 1,\n  \"type\": 1,\n  \"receiveUserId\": {{userIdB}},\n  \"body\": {\n    \"content\": \"你好B，这是单聊测试消息！\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('A发消息响应:', JSON.stringify(res));",
+                  "if (res.sessionId) {",
+                  "  pm.collectionVariables.set('sessionId', res.sessionId);",
+                  "}",
+                  "if (res.messageId) {",
+                  "  pm.collectionVariables.set('messageId', res.messageId);",
+                  "}",
+                  "pm.collectionVariables.set('clientMsgId1', 'test-single-msg-001');",
+                  "pm.test('A给B发消息成功', function() {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.2 B给A发消息",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientMsgId\": \"test-single-msg-002\",\n  \"sessionId\": \"{{sessionId}}\",\n  \"sessionType\": 1,\n  \"type\": 1,\n  \"receiveUserId\": {{userIdA}},\n  \"body\": {\n    \"content\": \"你好A，收到你的消息了！\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('B给A发消息成功', function() {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3.3 幂等验证-重复clientMsgId",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientMsgId\": \"test-single-msg-001\",\n  \"sessionId\": \"{{sessionId}}\",\n  \"sessionType\": 1,\n  \"type\": 1,\n  \"receiveUserId\": {{userIdB}},\n  \"body\": {\n    \"content\": \"这是重复消息，应该被拦截\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('重复clientMsgId应被拦截', function() {",
+                  "  var code = pm.response.code;",
+                  "  // 期望非200或响应体中有错误提示",
+                  "  var res = pm.response.json();",
+                  "  console.log('幂等验证响应:', JSON.stringify(res));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. 群聊",
+      "item": [
+        {
+          "name": "4.1 A创建群聊(拉B和C入群)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/session/createGroup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "session", "createGroup"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"memberIds\": [{{userIdB}}, {{userIdC}}]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('创建群聊响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data && res.data.sessionId) {",
+                  "  pm.collectionVariables.set('groupSessionId', res.data.sessionId);",
+                  "  console.log('groupSessionId:', res.data.sessionId);",
+                  "  console.log('groupName:', res.data.name);",
+                  "}",
+                  "pm.test('创建群聊会话成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.sessionId).to.include('group_');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.2 A在群里发消息",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientMsgId\": \"test-group-msg-001\",\n  \"sessionId\": \"{{groupSessionId}}\",\n  \"sessionType\": 2,\n  \"type\": 1,\n  \"body\": {\n    \"content\": \"大家好，这是群聊测试消息！\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('A在群里发消息成功', function() {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.3 B在群里发消息",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientMsgId\": \"test-group-msg-002\",\n  \"sessionId\": \"{{groupSessionId}}\",\n  \"sessionType\": 2,\n  \"type\": 1,\n  \"body\": {\n    \"content\": \"收到A的群消息了！\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('B在群里发消息成功', function() {",
+                  "  pm.expect(pm.response.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.4 C退出群聊",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenC}}" },
+              { "key": "X-User-Id", "value": "{{userIdC}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/session/leaveGroup?sessionId={{groupSessionId}}&userId={{userIdC}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "session", "leaveGroup"],
+              "query": [
+                { "key": "sessionId", "value": "{{groupSessionId}}" },
+                { "key": "userId", "value": "{{userIdC}}" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('C退出群聊成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "5. 红包",
+      "description": "注册时自动赠送1000元余额，无需额外充值",
+      "item": [
+        {
+          "name": "5.1 A给B发单聊普通红包",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"receiveUserId\": {{userIdB}},\n  \"sessionType\": 1,\n  \"type\": 5,\n  \"body\": {\n    \"redPacketType\": 1,\n    \"totalAmount\": 1.00,\n    \"totalCount\": 1,\n    \"redPacketWrapperText\": \"测试红包\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('发红包响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  var body = res.data.body;",
+                  "  if (body && body.content) {",
+                  "    pm.collectionVariables.set('redPacketId', body.content);",
+                  "    console.log('redPacketId:', body.content);",
+                  "  }",
+                  "}",
+                  "pm.test('A给B发单聊红包成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.2 B抢红包",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/receive",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "receive"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"redPacketId\": {{redPacketId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('B抢红包响应:', JSON.stringify(res));",
+                  "pm.test('B抢红包成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.receivedAmount).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.3 B重复抢红包-应失败",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/receive",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "receive"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"redPacketId\": {{redPacketId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('重复抢红包响应:', JSON.stringify(res));",
+                  "pm.test('重复抢红包应被拦截', function() {",
+                  "  pm.expect(res.code).to.not.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.4 查看红包详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/detail/{{redPacketId}}?pageNum=1&pageSize=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "detail", "{{redPacketId}}"],
+              "query": [
+                { "key": "pageNum", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('红包详情:', JSON.stringify(res));",
+                  "pm.test('查看红包详情成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.totalAmount).to.eql(1);",
+                  "  pm.expect(res.data.remainingCount).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.5 A在群里发拼手气红包",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/send",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "send"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{groupSessionId}}\",\n  \"sessionType\": 2,\n  \"type\": 5,\n  \"body\": {\n    \"redPacketType\": 2,\n    \"totalAmount\": 10.00,\n    \"totalCount\": 3,\n    \"redPacketWrapperText\": \"群聊拼手气红包\"\n  }\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('群红包响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  var body = res.data.body;",
+                  "  if (body && body.content) {",
+                  "    pm.collectionVariables.set('groupRedPacketId', body.content);",
+                  "    console.log('groupRedPacketId:', body.content);",
+                  "  }",
+                  "}",
+                  "pm.test('A在群里发拼手气红包成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.6 B抢群红包",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/receive",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "receive"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"redPacketId\": {{groupRedPacketId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('B抢群红包响应:', JSON.stringify(res));",
+                  "pm.test('B抢群红包成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.receivedAmount).to.not.be.null;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5.7 查看群红包详情",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/message/redpacket/detail/{{groupRedPacketId}}?pageNum=1&pageSize=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "message", "redpacket", "detail", "{{groupRedPacketId}}"],
+              "query": [
+                { "key": "pageNum", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('群红包详情:', JSON.stringify(res));",
+                  "pm.test('查看群红包详情成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data.totalAmount).to.eql(10);",
+                  "  pm.expect(res.data.redPacketType).to.eql(2);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "6. 离线消息",
+      "item": [
+        {
+          "name": "6.1 B查看未读数",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/offline/unread",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offline", "unread"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('B未读数:', JSON.stringify(res));",
+                  "pm.test('查看未读数成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6.2 B拉取离线消息",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/offline/pull",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offline", "pull"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"lastSeq\": 0,\n  \"pageSize\": 50\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('B离线消息:', JSON.stringify(res));",
+                  "pm.test('拉取离线消息成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "6.3 B标记已读",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/offline/read",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offline", "read"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sessionId\": \"{{sessionId}}\",\n  \"lastReadSeq\": 999999\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('标记已读成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "7. 朋友圈",
+      "item": [
+        {
+          "name": "7.1 A发朋友圈",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/publish",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "publish"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"今天天气真好，InfiniteChat 功能验证中！\",\n  \"images\": []\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "console.log('发朋友圈响应:', JSON.stringify(res));",
+                  "if (res.code === 200 && res.data) {",
+                  "  pm.collectionVariables.set('momentId', String(res.data));",
+                  "}",
+                  "pm.test('A发朋友圈成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7.2 B查看好友动态",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/friends?pageNum=1&pageSize=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "friends"],
+              "query": [
+                { "key": "pageNum", "value": "1" },
+                { "key": "pageSize", "value": "10" }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('B能看到好友动态', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "  pm.expect(res.data).to.be.an('array').that.is.not.empty;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7.3 B点赞",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/like",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "like"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momentId\": {{momentId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('B点赞成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7.4 重复点赞-应失败",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/like",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "like"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momentId\": {{momentId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('重复点赞应被拦截', function() {",
+                  "  pm.expect(res.code).to.not.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7.5 B评论",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/comment",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "comment"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momentId\": {{momentId}},\n  \"content\": \"确实不错！\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('B评论成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "7.6 B取消点赞",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenB}}" },
+              { "key": "X-User-Id", "value": "{{userIdB}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/moment/unlike",
+              "host": ["{{base_url}}"],
+              "path": ["api", "moment", "unlike"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"momentId\": {{momentId}}\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('B取消点赞成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "8. 登出与安全",
+      "item": [
+        {
+          "name": "8.1 A登出",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/v1/user/logout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "v1", "user", "logout"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var res = pm.response.json();",
+                  "pm.test('A登出成功', function() {",
+                  "  pm.expect(res.code).to.eql(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "8.2 旧Token访问-应401",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{tokenA}}" },
+              { "key": "X-User-Id", "value": "{{userIdA}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/contact/list",
+              "host": ["{{base_url}}"],
+              "path": ["api", "contact", "list"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('登出后旧Token应被拒绝', function() {",
+                  "  pm.expect(pm.response.code).to.eql(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

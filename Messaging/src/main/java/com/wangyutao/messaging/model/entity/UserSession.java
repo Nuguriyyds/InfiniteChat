@@ -26,5 +26,10 @@ public class UserSession {
 
     private Integer status;
 
+    /**
+     * 该用户在本会话中已确认收到的最大消息 seq，用于重连/换设备时的离线消息补齐
+     */
+    private Long lastAckSeq;
+
     private Date createTime;
 }

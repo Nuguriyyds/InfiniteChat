@@ -7,9 +7,14 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class AckData {
 
-    private Long sessionId;
+    private String sessionId;
 
-    private Long receiveUserUuid;
+    private Long seq;
 
+    private String messageId;
+
+    /**
+     * Backward-compatible alias used by older WS scripts.
+     */
     private String msgUuid;
 }

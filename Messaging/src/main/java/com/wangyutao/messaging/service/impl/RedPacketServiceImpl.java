@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,8 +45,10 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
     private final UserBalanceMapper userBalanceMapper;
     private final BalanceLogMapper balanceLogMapper;
     private final MessageService messageService; // 🌟 统一叫 MessageService
-    private final StringRedisTemplate redisTemplate; // 🌟 统一使用 StringRedisTemplate
-    private final IdGenerator idGenerator; // 🌟 换成咱们自己的抗回拨发号器！
+    private final StringRedisTemplate redisTemplate;
+    private final IdGenerator idGenerator;
+    private final RocketMQTemplate rocketMQTemplate;
+    private final RedPacketMapper redPacketMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -55,7 +59,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         Long senderId = request.getSendUserId();
         BigDecimal totalAmount = body.getTotalAmount();
         int totalCount = body.getTotalCount();
-        Long sessionId = request.getSessionId();
+        String sessionId = request.getSessionId();
 
         // 扣减余额
         deductUserBalanceSafe(senderId, totalAmount);
@@ -69,8 +73,11 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         // 发送红包消息到 IM 通道
         ResponseMsgVo response = sendRedPacketMessage(request, redPacket);
 
-        // 🌟 P0-3: 预热 Redis - 预先计算金额并存储
+        // 预热 Redis - 预先计算金额并存储
         preCalculateAndStoreAmounts(redPacket.getRedPacketId(), totalAmount, totalCount, body.getRedPacketType());
+
+        // 发送 24 小时延迟消息，到期触发过期退款
+        sendExpireDelayMessage(redPacket.getRedPacketId());
 
         return response;
     }
@@ -183,6 +190,23 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         return randomAmount.compareTo(min) < 0 ? min : randomAmount;
     }
 
+    private void sendExpireDelayMessage(Long redPacketId) {
+        try {
+            long delayMs = RedPacketConstants.RED_PACKET_EXPIRE_HOURS.getIntValue() * 3600 * 1000L;
+            long deliverTimeMs = System.currentTimeMillis() + delayMs;
+
+            org.springframework.messaging.Message<String> msg = MessageBuilder
+                    .withPayload(String.valueOf(redPacketId))
+                    .build();
+
+            rocketMQTemplate.syncSendDeliverTimeMills("RED_PACKET_EXPIRE", msg, deliverTimeMs);
+            log.info("红包过期延迟消息发送成功, redPacketId={}, 将在{}h后投递", redPacketId,
+                    RedPacketConstants.RED_PACKET_EXPIRE_HOURS.getIntValue());
+        } catch (Exception e) {
+            log.warn("红包过期延迟消息发送失败（兜底定时任务会补偿）, redPacketId={}", redPacketId, e);
+        }
+    }
+
     /**
      * 将红包剩余个数设置到 Redis（已被 preCalculateAndStoreAmounts 替代）
      *
@@ -209,6 +233,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
         BeanUtils.copyProperties(request, sendMsgRequest);
 
         sendMsgRequest.setType(5);
+        sendMsgRequest.setClientMsgId("rp_" + redPacket.getRedPacketId());
         RedPacketMessageBody redPacketMessageBody = new RedPacketMessageBody();
         redPacketMessageBody.setContent(String.valueOf(redPacket.getRedPacketId()));
         redPacketMessageBody.setRedPacketWrapperText(redPacket.getRedPacketWrapperText());
@@ -281,7 +306,7 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
                                       BigDecimal totalAmount,
                                       int totalCount,
                                       int redPacketType,
-                                      Long sessionId) {
+                                      String sessionId) {
         RedPacket redPacket = new RedPacket();
         redPacket.setRedPacketId(idGenerator.nextId());
         redPacket.setSenderId(senderId);
@@ -336,10 +361,19 @@ public class RedPacketServiceImpl extends ServiceImpl<RedPacketMapper, RedPacket
     @Override
     @Transactional
     public void handleExpiredRedPacket(Long redPacketId) {
-        RedPacket redPacket = getById(redPacketId);
+        int rows = redPacketMapper.casUpdateStatus(
+                redPacketId,
+                RedPacketStatus.UNCLAIMED.getStatus(),
+                RedPacketStatus.EXPIRED.getStatus()
+        );
+        if (rows == 0) {
+            log.info("红包已被处理（已领完/已过期/不存在），幂等跳过, redPacketId={}", redPacketId);
+            return;
+        }
 
-        if (redPacket == null || !RedPacketStatus.UNCLAIMED.equals(redPacket.getStatus())) {
-            log.info("红包不存在、已被领取完或已过期，红包ID: {}", redPacketId);
+        RedPacket redPacket = getById(redPacketId);
+        if (redPacket == null) {
+            log.error("CAS 更新成功但查询不到红包，数据异常, redPacketId={}", redPacketId);
             return;
         }
 

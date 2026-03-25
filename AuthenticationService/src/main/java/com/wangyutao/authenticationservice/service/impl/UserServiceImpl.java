@@ -3,6 +3,7 @@ package com.wangyutao.authenticationservice.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.IdUtil;
+import cn.hutool.crypto.digest.BCrypt;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wangyutao.authenticationservice.constants.OSSConstant;
 import com.wangyutao.authenticationservice.model.dto.*;
@@ -15,6 +16,7 @@ import com.wangyutao.authenticationservice.mapper.UserMapper;
 import com.wangyutao.authenticationservice.model.entity.User;
 import com.wangyutao.authenticationservice.model.entity.UserBalance;
 import com.wangyutao.authenticationservice.model.vo.*;
+import com.wangyutao.authenticationservice.service.JwtBlacklistService;
 import com.wangyutao.authenticationservice.service.UserService;
 import com.wangyutao.authenticationservice.utils.*;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
                 // 🌟 极其关键的细节：在邮件正文里打上手机号的 Tag
                 // 这样你用 13800000001 和 13800000002 注册时，看邮件就知道是哪个号的码了
-                mail.setMsg("系统已拦截发往手机号 [" + phone + "] 的短信。\n您的验证码为: " + code + "\n(一分钟内有效)");
+                mail.setMsg("系统已拦截发往手机号 [" + phone + "] 的短信。\n您的验证码为: " + code + "\n(五分钟内有效)");
 
                 mail.send();
                 log.info("📢 [Mock模式生效] 手机号 {} 的验证码 {} 已重定向发送至开发者邮箱", phone, code);
@@ -135,7 +137,6 @@ public class UserServiceImpl implements UserService {
         UserVO userVO = new UserVO();
         BeanUtil.copyProperties(user, userVO);
 
-        // 调用复用方法颁发 Token
         buildNewTokenPair(userVO);
 
         // 获取 Netty 服务实例
@@ -150,27 +151,22 @@ public class UserServiceImpl implements UserService {
     public void userRegister(UserRegisterRequest request) {
         String phone = request.getPhone();
 
-        // 1. 🌟 Fail-Fast：在抢锁前就拦截掉错误的验证码，保护锁资源
-        String redisCode = redisTemplate.opsForValue().get(phone);
-        ThrowUtils.throwIf(redisCode == null || !redisCode.equals(request.getCode()), ErrorEnum.CODE_ERROR);
-
-        // 2. 🔥 锁外预处理：将耗时的 BCrypt 加密和 ID 生成前置，缩小锁粒度
-        String encryptedPassword = cn.hutool.crypto.digest.BCrypt.hashpw(request.getPassword());
+        // 锁外预处理：BCrypt 加密 ~100ms，ID 生成 ~1ms，前置以缩小锁粒度
+        String encryptedPassword = BCrypt.hashpw(request.getPassword());
         Long distributedUserId = idGenerator.nextId();
         String generatedNickname = new NicknameGeneratorUtil().generateNickname();
 
-        // 3. 拼接出精准的细粒度锁 Key
         String lockKey = "register:lock:" + phone;
 
-        // 4. 🔥 改为固定 5 秒超时，避免看门狗无限续期导致死锁
         redisLockExecutor.executeWithLock(lockKey, 3000, 5000, () -> {
             return transactionTemplate.execute(status -> {
-                // --- 下面的逻辑全部受到分布式锁的严密保护 ---
 
-                // 核心查重，防止高并发下多个请求同时绕过校验
+                // 验证码校验必须在锁内，消除锁外校验与锁内操作之间的 TOCTOU 竞态窗口
+                String redisCode = redisTemplate.opsForValue().get(phone);
+                ThrowUtils.throwIf(redisCode == null || !redisCode.equals(request.getCode()), ErrorEnum.CODE_ERROR);
+
                 ThrowUtils.throwIf(isReRegister(phone), ErrorEnum.REGISTER_ERROR);
 
-                // 使用预处理的数据，减少锁内耗时
                 User user = new User()
                         .setUserId(distributedUserId)
                         .setUserName(generatedNickname)
@@ -179,22 +175,13 @@ public class UserServiceImpl implements UserService {
 
                 ThrowUtils.throwIf(userMapper.insert(user) <= 0, ErrorEnum.MYSQL_ERROR);
 
-                // 🔥 UserBalance 插入改为异步，进一步缩短锁持有时间
-                final Long finalUserId = user.getUserId();
-                CompletableFuture.runAsync(() -> {
-                    try {
-                        UserBalance userBalance = new UserBalance()
-                                .setUserId(finalUserId)
-                                .setBalance(BigDecimal.valueOf(1000))
-                                .setUpdatedAt(LocalDateTime.now());
-                        userBalanceMapper.insert(userBalance);
-                        log.info("✅ 用户余额初始化成功: userId={}", finalUserId);
-                    } catch (Exception e) {
-                        log.error("❌ 用户余额初始化失败: userId={}", finalUserId, e);
-                    }
-                }, ioThreadPool);
+                UserBalance userBalance = new UserBalance()
+                        .setUserId(user.getUserId())
+                        .setBalance(BigDecimal.valueOf(1000))
+                        .setUpdatedAt(LocalDateTime.now());
+                ThrowUtils.throwIf(userBalanceMapper.insert(userBalance) <= 0, ErrorEnum.MYSQL_ERROR);
 
-                // 🌟 必须在注册成功后，销毁验证码！
+                // 事务提交前销毁验证码，保证一次性消费
                 redisTemplate.delete(phone);
 
                 return null;
@@ -225,14 +212,14 @@ public class UserServiceImpl implements UserService {
     public void userLogout(UserLogOutRequest request) {
         String userIdStr = String.valueOf(request.getUserId());
         
-        // 🔥 1. 将用户加入黑名单（布隆过滤器）
+        // 🔥 1. 记录登出时间戳（与网关 jwt:logout 比较 token.iat）
         jwtBlacklistService.addToBlacklist(userIdStr);
         
         // 🔥 2. 使用 Lua 脚本保证原子性：删除 Token + 路由缓存 + 发布踢人消息
-        String luaScript = 
-            "redis.call('del', KEYS[1]) " +
-            "redis.call('del', KEYS[2]) " +
-            "redis.call('publish', KEYS[3], ARGV[1]) " +
+        String luaScript =
+            "redis.call('del', KEYS[1]); " +
+            "redis.call('del', KEYS[2]); " +
+            "redis.call('publish', KEYS[3], ARGV[1]); " +
             "return 1";
         
         try {
@@ -253,16 +240,19 @@ public class UserServiceImpl implements UserService {
             throw new com.wangyutao.authenticationservice.exception.BusinessException(ErrorEnum.SYSTEM_ERROR);
         }
         
-        // 🔥 异步补偿：确保 Netty 节点收到踢人指令（防止 Pub/Sub 消息丢失）
+        // 异步补偿：检查路由是否已清除，若仍残留则重新删除并发布踢人消息
         CompletableFuture.runAsync(() -> {
             try {
                 Thread.sleep(1000);
-                String nettyHost = serviceInstanceUtil.getServiceInstance(Long.parseLong(userIdStr));
-                if (nettyHost != null) {
-                    log.info("🔄 登出补偿检查: userId={}, nettyHost={}", userIdStr, nettyHost);
+                String routeKey = ConfigEnum.NETTY_SERVER_HEAD.getValue() + userIdStr;
+                String remainingRoute = redisTemplate.opsForValue().get(routeKey);
+                if (remainingRoute != null) {
+                    redisTemplate.delete(routeKey);
+                    redisTemplate.convertAndSend(ConfigEnum.REDIS_CONVERT_SEND.getValue(), routeKey);
+                    log.info("登出补偿: 路由残留已清除, userId={}, remainingRoute={}", userIdStr, remainingRoute);
                 }
             } catch (Exception e) {
-                log.warn("⚠️ 登出补偿检查失败: userId={}", userIdStr, e);
+                log.warn("登出补偿检查失败: userId={}", userIdStr, e);
             }
         }, ioThreadPool);
     }
@@ -292,14 +282,13 @@ public class UserServiceImpl implements UserService {
         // 校验失败：Token 不存在、已被使用或不匹配
         ThrowUtils.throwIf(result == null || result == 0, ErrorEnum.LOGIN_EXPIRED);
         
-        log.info("✅ RefreshToken 校验通过并已销毁: userId={}", userId);
+        log.info("RefreshToken 校验通过并已销毁: userId={}", userId);
         
-        // 校验通过，重新生成一对全新的 Token (Token Rotation 机制)
-        UserVO userVO = new UserVO();
-        userVO.setUserId(userId);
-        buildNewTokenPair(userVO);
-        
-        return userVO;
+        // 从数据库查出完整用户信息，避免返回给前端的 VO 字段大面积为 null
+        User user = userMapper.selectOne(new QueryWrapper<User>().eq("user_id", userId));
+        ThrowUtils.throwIf(user == null, ErrorEnum.LOGIN_EXPIRED);
+
+        return buildUserVOAndAllocateNode(user);
     }
 
 
@@ -323,6 +312,7 @@ public class UserServiceImpl implements UserService {
                 refreshToken,
                 7, TimeUnit.DAYS
         );
+        // 故意不删除 jwt:logout：保留最后登出时间，使「登出前签发」的被盗 AT 在重新登录后仍会被网关拒绝（iat < logoutAt）
     }
 }
 

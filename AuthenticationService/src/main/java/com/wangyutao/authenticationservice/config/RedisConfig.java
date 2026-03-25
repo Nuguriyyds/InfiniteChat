@@ -22,7 +22,7 @@ public class RedisConfig {
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
         // 创建 Lettuce 连接工厂，连接到本地 Redis
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("127.0.0.1", 59000);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("172.30.233.168", 59000);
         config.setPassword(RedisPassword.of("e65K4t8w2"));
         return new LettuceConnectionFactory(config);
     }

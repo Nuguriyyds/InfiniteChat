@@ -23,4 +23,7 @@ public interface RedPacketReceiveMapper extends BaseMapper<RedPacketReceive> {
      */
     @Select("SELECT * FROM red_packet_receive WHERE red_packet_id = #{redPacketId} ORDER BY received_at DESC")
     Page<RedPacketReceive> selectByRedPacketId(Page<RedPacketReceive> page, @Param("redPacketId") Long redPacketId);
+
+    @Select("SELECT COUNT(1) FROM red_packet_receive WHERE red_packet_id = #{redPacketId} AND receiver_id = #{userId}")
+    int countByRedPacketAndUser(@Param("redPacketId") Long redPacketId, @Param("userId") Long userId);
 }

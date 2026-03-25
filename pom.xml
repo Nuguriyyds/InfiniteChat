@@ -15,6 +15,8 @@
         <module>Gateway</module>
         <module>Messaging</module>
         <module>contact</module>
+        <module>moment</module>
+        <module>OfflineService</module>
     </modules>
 
 

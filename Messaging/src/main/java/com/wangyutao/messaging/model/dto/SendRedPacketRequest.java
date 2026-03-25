@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Accessors(chain = true)
 public class SendRedPacketRequest {
 
-    private Long sessionId;
+    private String sessionId;
 
     private Long receiveUserId;
 

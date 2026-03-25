@@ -1,0 +1,11 @@
+spring:
+  redis:
+    host: localhost
+  cloud:
+    nacos:
+      server-addr: localhost:18375
+      discovery:
+        ip:
+
+rocketmq:
+  name-server: localhost:9876

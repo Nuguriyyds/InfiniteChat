@@ -28,77 +28,77 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getPath().value();
 
-        // 1. 📋 合并白名单逻辑：登录、注册、续期、Swagger 全部放行
         if (path.matches("/api/v1/user/noToken/.*") ||
                 path.equals("/api/v1/user/refreshToken") ||
                 path.startsWith("/swagger") ||
                 path.startsWith("/v3/api-docs") ||
-                path.startsWith("/webjars")) {
+                path.startsWith("/webjars") ||
+                path.startsWith("/api/message")) { // 压测临时白名单，压测完删除
             return chain.filter(exchange);
         }
 
-        // 2. 🔍 智能取票：先从 Header 找 (针对普通 HTTP)
         String token = request.getHeaders().getFirst("Authorization");
 
-        // 🌟 补全缺失的代码：如果 Header 里没有，尝试从 URL 参数中获取 (针对 WebSocket)
         if (StringUtils.isBlank(token)) {
             token = request.getQueryParams().getFirst("token");
         }
 
-        // 如果 Header 里没有，再试图从 URL 参数里找 (针对 Netty 的 WebSocket 握手)
-        // 🌟 标准协议修复：剥离 Bearer 前缀
         if (StringUtils.isNotBlank(token) && token.startsWith("Bearer ")) {
-            token = token.substring(7); // 截掉 "Bearer "
+            token = token.substring(7);
         }
 
-        // 3. 拦截无票人员
         if (StringUtils.isBlank(token)) {
-            log.warn("❌ 网关拦截：未携带 Token，路径: {}", path);
+            log.warn("网关拦截：未携带 Token，路径: {}", path);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
 
+        Claims claims;
         try {
-            // 4. 🌟 无状态纯 CPU 验签（不再查 Redis！）
-            Claims claims = JwtUtil.parse(token);
+            claims = JwtUtil.parse(token);
             if (claims == null) {
-                throw new RuntimeException("Token 签名无效或已篡改");
+                return rejectUnauthorized(exchange, path, "Token 签名无效或已篡改");
             }
-
-            // 拿到身份证号
-            String userId = claims.getSubject();
-
-            // 5. 🔥 黑名单检查：使用布隆过滤器判断用户是否已登出
-            if (jwtBlacklistService.isInBlacklist(userId)) {
-                log.warn("❌ 网关拦截：用户已登出（黑名单），userId: {}, path: {}", userId, path);
-                throw new RuntimeException("用户已登出，Token 已失效");
-            }
-
-            // 6. 🌟 降维魔法：把 userId 悄悄塞进请求头里，透传给背后的微服务！
-            ServerHttpRequest mutatedRequest = request.mutate()
-                    .header("X-User-Id", userId)
-                    .build();
-            ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-
-            log.debug("✅ 网关放行：鉴权成功，路径: {}, userId: {}", path, userId);
-            return chain.filter(mutatedExchange);
-
         } catch (Exception e) {
-            log.warn("❌ 网关拦截：Token 已过期或不合法，路径: {}, 原因: {}", path, e.getMessage());
-            ServerHttpResponse response = exchange.getResponse();
-            response.setStatusCode(HttpStatus.UNAUTHORIZED);
-            response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-
-            // 🌟 组装符合你系统的全局统一 JSON 格式
-            String resultJson = "{\"code\":401,\"message\":\"Token已过期或不合法，请重新登录\",\"data\":null}";
-
-            org.springframework.core.io.buffer.DataBuffer buffer = response.bufferFactory().wrap(resultJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            return response.writeWith(reactor.core.publisher.Mono.just(buffer));
+            return rejectUnauthorized(exchange, path, e.getMessage());
         }
+
+        String userId = claims.getSubject();
+        long tokenIssuedAt = claims.getIssuedAt().getTime();
+
+        // 响应式登出校验：比较 Token 签发时间与用户登出时间
+        return jwtBlacklistService.getLogoutTime(userId)
+                .flatMap(logoutTime -> {
+                    if (logoutTime > 0 && tokenIssuedAt < logoutTime) {
+                        log.warn("网关拦截：Token 签发于登出之前，userId: {}, iat: {}, logoutAt: {}, path: {}",
+                                userId, tokenIssuedAt, logoutTime, path);
+                        return rejectUnauthorized(exchange, path, "用户已登出，Token 已失效");
+                    }
+
+                    ServerHttpRequest mutatedRequest = request.mutate()
+                            .header("X-User-Id", userId)
+                            .build();
+                    ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
+
+                    log.debug("网关放行：鉴权成功，路径: {}, userId: {}", path, userId);
+                    return chain.filter(mutatedExchange);
+                });
+    }
+
+    private Mono<Void> rejectUnauthorized(ServerWebExchange exchange, String path, String reason) {
+        log.warn("网关拦截：Token 已过期或不合法，路径: {}, 原因: {}", path, reason);
+        ServerHttpResponse response = exchange.getResponse();
+        response.setStatusCode(HttpStatus.UNAUTHORIZED);
+        response.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
+
+        String resultJson = "{\"code\":401,\"message\":\"Token已过期或不合法，请重新登录\",\"data\":null}";
+        org.springframework.core.io.buffer.DataBuffer buffer =
+                response.bufferFactory().wrap(resultJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        return response.writeWith(Mono.just(buffer));
     }
 
     @Override
     public int getOrder() {
-        return -1; // 最高优先级，必须在路由转发前验票
+        return -1;
     }
 }

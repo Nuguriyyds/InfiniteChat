@@ -7,66 +7,75 @@ import io.netty.channel.Channel;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.spring.annotation.ConsumeMode;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 @RocketMQMessageListener(
-        topic = "IM_CHAT", // 如果你未来拆了 IM_NOTICE，可以复制一个一模一样的 Listener
+        topic = "IM_CHAT",
         consumerGroup = "netty-push-group-${im.node.id:NODE_1}",
         selectorExpression = "${im.node.id:NODE_1}",
-        consumeMode = ConsumeMode.ORDERLY
+        consumeMode = ConsumeMode.CONCURRENTLY
 )
 public class NettyPushMessageListener implements RocketMQListener<String> {
 
+    private static final long OFFLINE_SEND_TIMEOUT_MS = 3000L;
+
     private final NettySessionManager nettySessionManager;
+    private final RocketMQTemplate rocketMQTemplate;
 
     @Override
     public void onMessage(String mqJsonPayload) {
         try {
-            // 1. 🌟 只解析标准件纸箱！不关心里面装的是聊天还是通知
             GatewayPushPacket packet = JSON.parseObject(mqJsonPayload, GatewayPushPacket.class);
-
-            List<Long> targetUserIds = packet.getTargetUserIds();
-            String pushContent = packet.getWsPayload(); // 这就是准备发给前端的纯文本
-
-            if (targetUserIds == null || targetUserIds.isEmpty() || pushContent == null) {
-                return;
+            if (packet == null) {
+                throw new IllegalArgumentException("GatewayPushPacket is null");
             }
 
-            // 💡 架构师注：为了极致性能，提前包装好 Netty 的 WebSocket 帧，避免在 for 循环里重复 new 对象
-            TextWebSocketFrame sharedFrame = new TextWebSocketFrame(pushContent);
+            List<Long> targetUserIds = packet.getTargetUserIds();
+            String pushContent = packet.getWsPayload();
+            if (targetUserIds == null || targetUserIds.isEmpty() || pushContent == null) {
+                throw new IllegalArgumentException("push packet targetUserIds/wsPayload is empty");
+            }
 
             int pushSuccessCount = 0;
-
-            // 2. 纯内存极速分发
+            List<Long> failedUserIds = new ArrayList<>();
             for (Long userId : targetUserIds) {
                 Channel channel = nettySessionManager.getChannel(userId);
-
                 if (channel != null && channel.isActive()) {
-                    // 🌟 核心：复用同一个帧对象，每次发送前调用 retain() 增加引用计数
-                    channel.writeAndFlush(sharedFrame.retain());
+                    channel.writeAndFlush(new TextWebSocketFrame(pushContent));
                     pushSuccessCount++;
                 } else {
-                    log.debug("用户 [{}] 不在当前节点，跳过推送", userId);
+                    failedUserIds.add(userId);
                 }
             }
 
-            // 🌟 最后释放原始帧的引用
-            sharedFrame.release();
+            if (!failedUserIds.isEmpty()) {
+                GatewayPushPacket offlinePacket = new GatewayPushPacket(failedUserIds, pushContent);
+                SendResult sendResult = rocketMQTemplate.syncSend(
+                        "IM_CHAT:OFFLINE",
+                        MessageBuilder.withPayload(JSON.toJSONString(offlinePacket)).build(),
+                        OFFLINE_SEND_TIMEOUT_MS
+                );
+                log.info("在线推送失败回流离线成功, offlineUserCount={}, sendStatus={}",
+                        failedUserIds.size(), sendResult != null ? sendResult.getSendStatus() : null);
+            }
 
-            log.info("MQ 消费下发完成, 目标人数: {}, 成功推送: {}", targetUserIds.size(), pushSuccessCount);
-
+            log.info("MQ 消费下发完成, targetCount={}, pushSuccessCount={}, offlineFallbackCount={}",
+                    targetUserIds.size(), pushSuccessCount, failedUserIds.size());
         } catch (Exception e) {
-            log.error("Netty 消费 MQ 消息出现异常，消息内容: {}", mqJsonPayload, e);
-            // 🌟 抛出异常，让 RocketMQ 自动重试 (最多 16 次)，失败后进入死信队列
-            throw new RuntimeException("消息处理失败，触发重试", e);
+            log.error("Netty 消费 MQ 消息异常, payload={}", mqJsonPayload, e);
+            throw new RuntimeException("Netty push consume failed", e);
         }
     }
 }

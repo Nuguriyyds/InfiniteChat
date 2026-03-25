@@ -8,16 +8,23 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="RealTimeCommunication" />
-        <module name="Messaging" />
-        <module name="AuthenticationService" />
+        <module name="OfflineService" />
         <module name="Gateway" />
         <module name="contact" />
+        <module name="Messaging" />
+        <module name="AuthenticationService" />
         <module name="moment" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="AgentService" target="17" />
       <module name="Common" target="1.8" />
       <module name="Service" target="1.8" />
     </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="AgentService" options="-parameters" />
+    </option>
   </component>
 </project>

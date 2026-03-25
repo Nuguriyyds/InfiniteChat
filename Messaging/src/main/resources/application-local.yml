@@ -1,0 +1,16 @@
+spring:
+  redis:
+    host: localhost
+  cloud:
+    nacos:
+      server-addr: localhost:18375
+      discovery:
+        ip:
+  datasource:
+    url: jdbc:mysql://localhost:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+
+minio:
+  url: http://localhost:9000
+
+rocketmq:
+  name-server: localhost:9876

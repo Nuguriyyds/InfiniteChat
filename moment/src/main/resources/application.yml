@@ -1,0 +1,46 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: moment-service
+  cloud:
+    nacos:
+      server-addr: 172.30.233.168:18375
+      username: nacos
+      password: nacos
+      discovery:
+        ip: 172.31.130.141
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://172.30.233.168:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: "gK3T9n%q2M@j7Z4"
+  redis:
+    host: 172.30.233.168
+    port: 6399
+    password: e65K4t8w2
+
+rocketmq:
+  name-server: 172.30.233.168:9876
+  producer:
+    group: moment-producer-group
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    # StdOutImpl 会同步刷控制台，易拖慢接口；需要 SQL 时把 mapper 包调到 debug 即可
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: assign_id
+
+logging:
+  level:
+    com.wangyutao.moment: debug
+
+feign:
+  circuitbreaker:
+    enabled: true

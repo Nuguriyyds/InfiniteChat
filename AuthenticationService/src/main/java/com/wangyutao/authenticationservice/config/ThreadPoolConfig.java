@@ -14,7 +14,7 @@ public class ThreadPoolConfig {
     public Executor ioThreadPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // 核心线程数：处理常规发邮件任务
-        executor.setCorePoolSize(8);
+        executor.setCorePoolSize(10);
         // 最大线程数：遇到恶意狂刷验证码时，最多开到 50 个线程
         executor.setMaxPoolSize(50);
         // 队列容量：最多允许 200 个邮件任务排队

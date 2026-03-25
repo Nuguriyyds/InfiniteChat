@@ -75,23 +75,7 @@ public class ConsistentHashLoadBalancer implements LoadBalancer {
                 instances.size(), newHashRing.size());
     }
 
-    /**
-     * 补习班原汁原味的 FNV1_32_HASH 算法 (极其适合做散列)
-     */
     private int getHash(String str) {
-        final int p = 16777619;
-        int hash = (int) 2166136261L;
-        for (int i = 0; i < str.length(); i++) {
-            hash = (hash ^ str.charAt(i)) * p;
-            hash += hash << 13;
-            hash ^= hash >> 7;
-            hash += hash << 3;
-            hash ^= hash >> 17;
-            hash += hash << 5;
-            if (hash < 0) {
-                hash = hash & 0x7FFFFFFF; // 简化了位运算取绝对值，更加直观
-            }
-        }
-        return hash;
+        return Math.abs(cn.hutool.core.util.HashUtil.murmur32(str.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
     }
 }

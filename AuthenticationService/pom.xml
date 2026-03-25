@@ -176,7 +176,7 @@
                 <version>${spring-boot.version}</version>
                 <configuration>
                     <mainClass>com.wangyutao.authenticationservice.AuthenticationServiceApplication</mainClass>
-                    <skip>true</skip>
+                    <skip>false</skip>
                 </configuration>
                 <executions>
                     <execution>

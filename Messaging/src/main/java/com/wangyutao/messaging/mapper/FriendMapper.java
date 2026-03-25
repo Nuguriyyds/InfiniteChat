@@ -9,7 +9,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface FriendMapper extends BaseMapper<Friend> {
 
-    // 🌟 直接用注解写 SQL，精准查询 A 和 B 的关系记录
-    @Select("SELECT status FROM im_friend WHERE user_id = #{userId} AND friend_id = #{friendId}")
+    @Select("SELECT status FROM contact WHERE user_id = #{userId} AND contact_id = #{friendId}")
     Friend selectFriendship(@Param("userId") Long userId, @Param("friendId") Long friendId);
 }

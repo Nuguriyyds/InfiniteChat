@@ -17,4 +17,15 @@ public interface RedPacketMapper extends BaseMapper<RedPacket> {
                                    @Param("amount") BigDecimal amount,
                                    @Param("count") Integer count,
                                    @Param("version") Integer version);
+
+    @Update("UPDATE red_packet " +
+            "SET remaining_amount = remaining_amount - #{amount}, remaining_count = remaining_count - 1 " +
+            "WHERE red_packet_id = #{id} AND remaining_count > 0 AND remaining_amount >= #{amount}")
+    int deductRedPacketRowLock(@Param("id") Long id, @Param("amount") BigDecimal amount);
+
+    @Update("UPDATE red_packet SET status = #{targetStatus} " +
+            "WHERE red_packet_id = #{id} AND status = #{expectedStatus}")
+    int casUpdateStatus(@Param("id") Long id,
+                        @Param("expectedStatus") Integer expectedStatus,
+                        @Param("targetStatus") Integer targetStatus);
 }
