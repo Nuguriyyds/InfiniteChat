@@ -8,25 +8,30 @@ spring:
       password: nacos
       discovery:
         ip: 172.31.130.141
+        metadata:
+          ws-protocol: ${netty.ws-protocol}
+          ws-port: ${netty.port}
+          ws-path: ${netty.ws-path}
   redis:
     host: 172.30.233.168
     port: 6399
     password: e65K4t8w2
 
 server:
-  port: 8083 # 供内部微服务调用 HTTP Push 接口的端口
+  port: 8083 # 供内部微服务调用的 HTTP Push 接口端口
+
 netty:
   port: 9101 # 供前端 WebSocket 连入的长连接物理端口
+  ws-protocol: ws
+  ws-path: /api/v1/chat/message
 
-# 🌟 新增：RocketMQ 配置
 rocketmq:
-  name-server: 172.30.233.168:9876 # 替换为你真实的 RocketMQ NameServer 地址
+  name-server: 172.30.233.168:9876
   producer:
-    group: rtc-push-producer-group # PushController 发送系统通知用的生产者组
+    group: rtc-push-producer-group
   consumer:
-    max-reconsume-times: 3  # 最多重试 3 次，失败后进入死信队列
+    max-reconsume-times: 3
 
-# 🌟 新增：架构核心！当前 Netty 节点的身份标识 (用于 MQ Tag 过滤和 Redis 路由注册)
 im:
   node:
     id: NODE_1

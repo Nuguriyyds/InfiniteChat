@@ -4,54 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="登录、网关、推送模块">
-      <change afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/config/RedisConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+    <list default="true" id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/AuthenticationService/authentication_DEV_SPEC.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/AuthenticationServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/AuthenticationServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/RedisConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/ThreadPoolConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/ThreadPoolConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/loderBalance/ConsistentHashLoadBalancer.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/loderBalance/ConsistentHashLoadBalancer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/TimeOutEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/TimeOutEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/Result.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultGenerator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/WebMvcConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ConfigEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ConfigEnum.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/impl/UserServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ServiceInstanceUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ServiceInstanceUtil.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Claude.md" beforeDir="false" afterPath="$PROJECT_DIR$/Claude.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DEPLOYMENT_GUIDE.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/filter/AuthorizeFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/filter/AuthorizeFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/MessagingApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/MessagingApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/config/RedisConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/constants/RedPacketConstants.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/constants/RedPacketConstants.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/controller/MessageController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/controller/MessageController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/FriendMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/FriendMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/RedPacketMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/RedPacketMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/RedPacketReceiveMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/mapper/RedPacketReceiveMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/dto/SendRedPacketRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/dto/SendRedPacketRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/Friend.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/Friend.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/RedPacket.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/RedPacket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/UserSession.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/model/entity/UserSession.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/UserSessionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/UserSessionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/RedPacketServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/RedPacketServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/UserSessionServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/UserSessionServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Messaging/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/RealTimeCommunicationApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/RealTimeCommunicationApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/listener/NettyPushMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/listener/NettyPushMessageListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/AckData.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/entity/AckData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/FriendApplicationNotification.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/model/push/FriendApplicationNotification.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/REVIEW_AUTH_GATEWAY.md" beforeDir="false" afterPath="$PROJECT_DIR$/REVIEW_AUTH_GATEWAY.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserKickoutMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserKickoutMessageListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/service/NettyMessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/service/NettyMessageService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/MessageInboundHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/MessageInboundHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettySessionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettySessionManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/WebSocketTokenAuthHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/WebSocketTokenAuthHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettyServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettyServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TEST_AND_DEPLOYMENT_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/TEST_AND_DEPLOYMENT_GUIDE.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/IM_CHAIN_TEST.md" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/IM_CHAIN_TEST.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/WS_LOAD_TEST.md" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/WS_LOAD_TEST.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/im_chain_test.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/im_chain_test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/ws_load_test.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/ws_load_test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -255,12 +230,12 @@
     </configuration>
     <list>
       <item itemvalue="Spring Boot.AuthenticationServiceApplication" />
-      <item itemvalue="Spring Boot.MessagingApplication" />
-      <item itemvalue="Spring Boot.RealTimeCommunicationApplication" />
-      <item itemvalue="Spring Boot.GatewayApplication" />
-      <item itemvalue="Spring Boot.OfflineServiceApplication" />
       <item itemvalue="Spring Boot.ContactApplication" />
+      <item itemvalue="Spring Boot.GatewayApplication" />
+      <item itemvalue="Spring Boot.MessagingApplication" />
       <item itemvalue="Spring Boot.MomentApplication" />
+      <item itemvalue="Spring Boot.OfflineServiceApplication" />
+      <item itemvalue="Spring Boot.RealTimeCommunicationApplication" />
     </list>
     <recent_temporary>
       <list>

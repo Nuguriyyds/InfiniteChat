@@ -6,6 +6,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -22,6 +23,12 @@ import reactor.core.publisher.Mono;
 public class AuthorizeFilter implements GlobalFilter, Ordered {
 
     private final JwtBlacklistService jwtBlacklistService;
+
+    @Value("${security.internal-request.header-name:X-Internal-Auth}")
+    private String internalRequestHeaderName;
+
+    @Value("${security.internal-request.secret:infinitechat_internal_auth_2026}")
+    private String internalRequestSecret;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -76,7 +83,12 @@ public class AuthorizeFilter implements GlobalFilter, Ordered {
                     }
 
                     ServerHttpRequest mutatedRequest = request.mutate()
-                            .header("X-User-Id", userId)
+                            .headers(headers -> {
+                                headers.remove("X-User-Id");
+                                headers.remove(internalRequestHeaderName);
+                                headers.set("X-User-Id", userId);
+                                headers.set(internalRequestHeaderName, internalRequestSecret);
+                            })
                             .build();
                     ServerWebExchange mutatedExchange = exchange.mutate().request(mutatedRequest).build();
 

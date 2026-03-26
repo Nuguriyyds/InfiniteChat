@@ -1,3 +1,8 @@
+security:
+  internal-request:
+    header-name: X-Internal-Auth
+    secret: ${INTERNAL_REQUEST_SECRET:infinitechat_internal_auth_2026}
+
 server:
   port: 8082
 

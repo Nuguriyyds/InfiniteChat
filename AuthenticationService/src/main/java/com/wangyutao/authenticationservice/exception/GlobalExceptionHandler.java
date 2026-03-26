@@ -1,50 +1,82 @@
 package com.wangyutao.authenticationservice.exception;
 
+import com.wangyutao.authenticationservice.common.Result;
+import com.wangyutao.authenticationservice.common.ResultGenerator;
 import com.wangyutao.authenticationservice.model.enums.ErrorEnum;
-import com.wangyutao.authenticationservice.model.vo.BaseResponse;
-import com.wangyutao.authenticationservice.utils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 @Slf4j
-@RestControllerAdvice // 🌟 相当于 @ControllerAdvice + @ResponseBody
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * 1. 拦截业务异常 (绝大部分 ThrowUtils 抛出的都是这个)
-     * 只要代码里执行了 ThrowUtils.throwIf(..., ErrorEnum.XXX)，就会被这里精准接住！
-     */
     @ExceptionHandler(BusinessException.class)
-    public BaseResponse<?> businessExceptionHandler(BusinessException e, HttpServletRequest request) {
-        log.warn("⚠️ 业务异常拦截 [路径: {}] - 错误码: {}, 错误信息: {}",
-                request.getRequestURI(), e.getCode(), e.getMessage());
-
-        // 🌟 返回你们项目定义的统一响应体 (BaseResponse / Result)
-        return ResultUtils.error(e.getCode(), e.getMessage());
+    public Result businessExceptionHandler(BusinessException e, HttpServletRequest request) {
+        log.warn("业务异常: uri={}, code={}, message={}", request.getRequestURI(), e.getCode(), e.getMessage());
+        return ResultGenerator.genFailResult(e.getCode(), e.getMessage());
     }
 
-    /**
-     * 2. 拦截参数校验异常 (可选)
-     * 如果你以后在 Controller 用了 @Validated 和 @NotBlank，参数不合法时会走这里
-     */
-    @ExceptionHandler(IllegalArgumentException.class)
-    public BaseResponse<?> illegalArgumentExceptionHandler(IllegalArgumentException e, HttpServletRequest request) {
-        log.warn("⚠️ 参数校验异常 [路径: {}] - 错误信息: {}", request.getRequestURI(), e.getMessage());
-        return ResultUtils.error(ErrorEnum.PARAMS_ERROR.getCode(), e.getMessage());
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Result methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e, HttpServletRequest request) {
+        String message = extractFirstBindingMessage(e.getBindingResult().getFieldError());
+        log.warn("请求体校验失败: uri={}, message={}", request.getRequestURI(), message);
+        return ResultGenerator.genFailResult(ErrorEnum.PARAMS_ERROR.getCode(), message);
     }
 
-    /**
-     * 3. 终极兜底：拦截所有未知的系统异常 (空指针、数组越界、SQL 语法错误等)
-     * 绝不能把详细的堆栈报错直接扔给前端，必须统一包装成“系统内部错误”
-     */
+    @ExceptionHandler(BindException.class)
+    public Result bindExceptionHandler(BindException e, HttpServletRequest request) {
+        String message = extractFirstBindingMessage(e.getBindingResult().getFieldError());
+        log.warn("参数绑定失败: uri={}, message={}", request.getRequestURI(), message);
+        return ResultGenerator.genFailResult(ErrorEnum.PARAMS_ERROR.getCode(), message);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Result constraintViolationExceptionHandler(ConstraintViolationException e, HttpServletRequest request) {
+        String message = e.getConstraintViolations().stream()
+                .findFirst()
+                .map(ConstraintViolation::getMessage)
+                .filter(StringUtils::isNotBlank)
+                .orElse(ErrorEnum.PARAMS_ERROR.getMsg());
+        log.warn("方法参数校验失败: uri={}, message={}", request.getRequestURI(), message);
+        return ResultGenerator.genFailResult(ErrorEnum.PARAMS_ERROR.getCode(), message);
+    }
+
+    @ExceptionHandler({
+            MissingServletRequestParameterException.class,
+            MissingRequestHeaderException.class,
+            MethodArgumentTypeMismatchException.class,
+            IllegalArgumentException.class,
+            HttpMessageNotReadableException.class
+    })
+    public Result badRequestExceptionHandler(Exception e, HttpServletRequest request) {
+        String message = StringUtils.defaultIfBlank(e.getMessage(), ErrorEnum.PARAMS_ERROR.getMsg());
+        log.warn("请求参数异常: uri={}, message={}", request.getRequestURI(), message);
+        return ResultGenerator.genFailResult(ErrorEnum.PARAMS_ERROR.getCode(), message);
+    }
+
     @ExceptionHandler(Exception.class)
-    public BaseResponse<?> runtimeExceptionHandler(Exception e, HttpServletRequest request) {
-        // 未知异常属于严重错误，必须打 error 日志并记录完整堆栈，方便查 Bug
-        log.error("❌ 系统未知异常 [路径: {}] - 异常详情: ", request.getRequestURI(), e);
+    public Result runtimeExceptionHandler(Exception e, HttpServletRequest request) {
+        log.error("系统异常: uri={}", request.getRequestURI(), e);
+        return ResultGenerator.genFailResult(ErrorEnum.SYSTEM_ERROR.getCode(), ErrorEnum.SYSTEM_ERROR.getMsg());
+    }
 
-        return ResultUtils.error(ErrorEnum.SYSTEM_ERROR.getCode(), ErrorEnum.SYSTEM_ERROR.getMsg());
+    private String extractFirstBindingMessage(FieldError fieldError) {
+        if (fieldError == null || StringUtils.isBlank(fieldError.getDefaultMessage())) {
+            return ErrorEnum.PARAMS_ERROR.getMsg();
+        }
+        return fieldError.getDefaultMessage();
     }
 }

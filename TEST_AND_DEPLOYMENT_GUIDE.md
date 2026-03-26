@@ -144,8 +144,7 @@ export TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 npm install -g wscat
 
 # 连接到 WebSocket 服务
-wscat -c "ws://172.30.233.168:10010/api/v1/chat/message" \
-  -H "Authorization: Bearer ${TOKEN}"
+wscat -c "ws://172.30.233.168:9101/api/v1/chat/message?token=${TOKEN}"
 ```
 
 **2. 发送消息**

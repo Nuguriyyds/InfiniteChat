@@ -31,7 +31,7 @@ Bring up a batch of online users, keep heartbeats alive, and watch server CPU / 
 ```bash
 node /opt/infinitechat/ws_load_test.js \
   --tokens=/opt/infinitechat/tokens.txt \
-  --url=ws://127.0.0.1:10010/api/v1/chat/message \
+  --url=ws://127.0.0.1:9101/api/v1/chat/message \
   --connections=500 \
   --ramp-up-ms=60000 \
   --heartbeat-ms=30000 \
@@ -88,6 +88,8 @@ This is a good resume/interview statement template:
 
 ## Notes
 
+- Under the formal WS contract, clients should connect directly to RTC: `ws://{rtc-host}:9101/api/v1/chat/message?token=...`.
+- If you want to pressure the retained Gateway proxy entry instead, pass `--url=ws://127.0.0.1:10010/api/v1/chat/message`.
 - The server uses single-login semantics, so do not open multiple concurrent sockets for the same user.
 - Current WS auth is `?token=` in the URL, not `Authorization` header.
 - The load script is meant to complement `wrk2`, not replace the HTTP-side pressure tests.

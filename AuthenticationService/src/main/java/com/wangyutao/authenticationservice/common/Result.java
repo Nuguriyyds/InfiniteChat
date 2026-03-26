@@ -12,6 +12,11 @@ public class Result<T> {
         return this;
     }
 
+    public Result setCode(int code) {
+        this.code = code;
+        return this;
+    }
+
     public int getCode() {
         return code;
     }

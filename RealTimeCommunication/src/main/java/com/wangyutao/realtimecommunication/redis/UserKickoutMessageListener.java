@@ -18,19 +18,16 @@ public class UserKickoutMessageListener implements MessageListener {
 
     private final NettySessionManager sessionManager;
 
-    @Value("${netty.node-id:NODE_1}")
+    @Value("${im.node.id:NODE_1}")
     private String localNodeId;
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
         try {
             String messageBody = new String(message.getBody(), StandardCharsets.UTF_8).trim();
-            log.info("收到 Redis 踢人广播，原始报文: {}", messageBody);
-
             String targetNodeId = null;
             String userIdStr;
 
-            // 新格式: "旧节点ID:用户ID"，旧格式兼容: 纯数字或 "im:route:数字"
             if (messageBody.contains(":") && !messageBody.startsWith("im:route:")) {
                 int colonIdx = messageBody.indexOf(":");
                 targetNodeId = messageBody.substring(0, colonIdx);
@@ -41,26 +38,28 @@ public class UserKickoutMessageListener implements MessageListener {
                 userIdStr = messageBody;
             }
 
-            // 如果广播明确指明了要踢的目标节点，且本节点不是那个目标节点，才忽略
             if (targetNodeId != null && !targetNodeId.equals(localNodeId)) {
-                log.debug("踢人广播目标是 [{}], 本节点是 [{}], 无需处理，直接忽略", targetNodeId, localNodeId);
+                log.debug("忽略非本节点踢线广播: localNodeId={}, targetNodeId={}, userId={}", localNodeId, targetNodeId, userIdStr);
                 return;
             }
 
             Long targetUserId = Long.valueOf(userIdStr);
             Channel channel = sessionManager.getChannel(targetUserId);
-
-            if (channel != null && targetNodeId != null) {
-                log.warn("正在执行跨服务物理踢出，切断用户 [{}] 的连接", targetUserId);
-                channel.close();
-            } else {
-                log.debug("目标用户 [{}] 不在当前 Netty 节点，忽略该广播", targetUserId);
+            if (channel == null) {
+                log.debug("踢线广播命中空会话: localNodeId={}, userId={}", localNodeId, targetUserId);
+                return;
             }
 
+            if (targetNodeId == null) {
+                log.warn("执行广播踢线: localNodeId={}, userId={}", localNodeId, targetUserId);
+            } else {
+                log.warn("执行精准踢线: localNodeId={}, targetNodeId={}, userId={}", localNodeId, targetNodeId, targetUserId);
+            }
+            channel.close();
         } catch (NumberFormatException e) {
-            log.error("踢人广播解析异常：userId 格式非法", e);
+            log.error("踢线广播解析失败: userId 非法", e);
         } catch (Exception e) {
-            log.error("处理踢人广播时发生未知异常", e);
+            log.error("处理踢线广播失败", e);
         }
     }
 }

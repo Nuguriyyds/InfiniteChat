@@ -24,6 +24,12 @@ public class ResultGenerator {
                 .setMessage(message);
     }
 
+    public static Result genFailResult(int code, String message) {
+        return new Result()
+                .setCode(code)
+                .setMessage(message);
+    }
+
 
     public static Result genFailResult() {
         return new Result()

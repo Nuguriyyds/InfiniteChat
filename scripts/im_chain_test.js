@@ -11,7 +11,7 @@ const { spawn } = require('child_process');
 
 const DEFAULTS = {
   gatewayBase: 'http://127.0.0.1:10010',
-  wsUrl: 'ws://127.0.0.1:10010/api/v1/chat/message',
+  wsUrl: 'ws://127.0.0.1:9101/api/v1/chat/message',
   tokens: '/opt/infinitechat/tokens.txt',
   sendData: '/opt/infinitechat/send_msg_data.txt',
   scenario: 'both',
@@ -37,7 +37,7 @@ function printHelp() {
     '',
     'Options:',
     '  --gateway-base=<url>         HTTP gateway base URL',
-    '  --ws-url=<url>               WS gateway URL',
+    '  --ws-url=<url>               RTC direct WS URL',
     '  --tokens=<path>              tokens.txt path (userId|token)',
     '  --send-data=<path>           send_msg_data.txt path (userId|token|sessionId|receiveUserId)',
     '  --scenario=<online|offline|both>',
@@ -66,7 +66,11 @@ function printHelp() {
     '  2. Online receiver WS delivery',
     '  3. Async persistence via /api/message/sync',
     '  4. Offline receiver pull via /api/offline/pull',
-    '  5. Optional MySQL record lookup when mysql CLI is available'
+    '  5. Optional MySQL record lookup when mysql CLI is available',
+    '',
+    'Notes:',
+    '  1. HTTP still goes through Gateway, while WS defaults to direct RTC under the formal contract.',
+    '  2. To exercise the retained Gateway WS proxy entry instead, override --ws-url=ws://127.0.0.1:10010/api/v1/chat/message'
   ].join('\n'));
 }
 

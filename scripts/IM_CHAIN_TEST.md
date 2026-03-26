@@ -50,7 +50,7 @@ node /opt/infinitechat/scripts/im_chain_test.js \
   --tokens=/opt/infinitechat/tokens.txt \
   --send-data=/opt/infinitechat/send_msg_data.txt \
   --gateway-base=http://127.0.0.1:10010 \
-  --ws-url=ws://127.0.0.1:10010/api/v1/chat/message
+  --ws-url=ws://127.0.0.1:9101/api/v1/chat/message
 ```
 
 Pick a later sender/receiver pair if the default one is dirty:
@@ -60,6 +60,8 @@ node /opt/infinitechat/scripts/im_chain_test.js \
   --scenario=both \
   --case-index=10
 ```
+
+By default, the formal contract is HTTP through Gateway plus WS direct to RTC. If you want to validate the retained Gateway WS proxy path instead, override `--ws-url=ws://127.0.0.1:10010/api/v1/chat/message`.
 
 ## Optional MySQL verification
 

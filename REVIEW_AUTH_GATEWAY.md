@@ -293,7 +293,7 @@ Token 字符串
   userId, userName, avatar, ...,
   token: "eyJ...",           ← AccessToken
   refreshToken: "eyJ...",    ← RefreshToken
-  nettyUrl: "ws://x.x.x.x:8081"
+  nettyUrl: "ws://x.x.x.x:9101/api/v1/chat/message"
 }
 ```
 
@@ -519,7 +519,7 @@ App                     Gateway(:10010)         Auth(:8082)          Redis      
  │                           │◀─────────────────────│                  │               │              │
  │◀──────────────────────────│  {token, refreshToken, nettyUrl, ...}   │               │              │
  │                           │                      │                  │               │              │
- │  ws://nettyHost:8081      │                      │                  │               │              │
+ │  ws://nettyHost:{metadata.ws-port}{metadata.ws-path} │          │                  │               │              │
  │══════════════════════════════════════════════════════════════▶ Netty (WebSocket 长连接)              │
 ```
 

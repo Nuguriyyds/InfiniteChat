@@ -25,13 +25,15 @@ public enum ConfigEnum {
     NETTY_SERVER("nettyServer","RealTimeCommunicationService"),
     REDIS_CONVERT_SEND("redisConvertSend","userLogout"),
 
-    // 🌟 新增：Netty WebSocket 协议和端口配置
-    NETTY_PROTOCOL("nettyProtocol", "ws://"),
-    // ⚠️ 注意：这里默认写 :8081，你需要根据你 Netty 实际监听的端口来改。
-    // 注意前面一定要带个冒号 ":" ！如果你的 Netty 还有 context-path，比如路由是 /chat，那就写 ":8081/chat"
-    NETTY_PORT("nettyPort", ":8081"),
+    // RTC WebSocket 直连地址配置
+    NETTY_WS_PROTOCOL_METADATA_KEY("nettyWsProtocolMetadataKey", "ws-protocol"),
+    NETTY_WS_PORT_METADATA_KEY("nettyWsPortMetadataKey", "ws-port"),
+    NETTY_WS_PATH_METADATA_KEY("nettyWsPathMetadataKey", "ws-path"),
 
-    AUTHORIZATION("authorization", "Authorization");
+    AUTHORIZATION("authorization", "Authorization"),
+    REFRESH_TOKEN_HEADER("refreshTokenHeader", "X-Refresh-Token"),
+    USER_ID_HEADER("userIdHeader", "X-User-Id"),
+    INTERNAL_REQUEST_HEADER("internalRequestHeader", "X-Internal-Auth");
 
     private final String text;
 
