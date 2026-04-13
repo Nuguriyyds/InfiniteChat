@@ -22,7 +22,8 @@ public enum ConfigEnum {
     IMAGE_URI("imageUri","http://47.113.96.105/img/avatar/"),
     IMAGE_PATH("imagePath", "/home/img/avatar/"),
     NETTY_SERVER_HEAD("nettyServerHead","Nacos:"),
-    REDIS_CONVERT_SEND("redisConvertSend","userLogout");
+    REDIS_CONVERT_SEND("redisConvertSend","userLogout"),
+    RTC_NODE_LOAD_ZSET("rtcNodeLoadZset", "im:rtc:load");
 
     private final String text;
 

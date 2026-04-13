@@ -4,28 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/AuthenticationService/authentication_DEV_SPEC.md" afterDir="false" />
+    <list default="true" id="01ac4295-2bf1-448c-903e-ab5544d52bbf" name="更改" comment="最终版">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/Result.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/Result.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultGenerator.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/common/ResultGenerator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/WebMvcConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/WebMvcConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/ThreadPoolConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/config/ThreadPoolConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/loderBalance/ConsistentHashLoadBalancer.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ConfigEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/model/enums/ConfigEnum.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/impl/UserServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/service/impl/UserServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ServiceInstanceUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/java/com/wangyutao/authenticationservice/utils/ServiceInstanceUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AuthenticationService/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/AuthenticationService/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/filter/AuthorizeFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/filter/AuthorizeFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/REVIEW_AUTH_GATEWAY.md" beforeDir="false" afterPath="$PROJECT_DIR$/REVIEW_AUTH_GATEWAY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserKickoutMessageListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/redis/UserKickoutMessageListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettyServer.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettyServer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TEST_AND_DEPLOYMENT_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/TEST_AND_DEPLOYMENT_GUIDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/IM_CHAIN_TEST.md" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/IM_CHAIN_TEST.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/WS_LOAD_TEST.md" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/WS_LOAD_TEST.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/config/NettyConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Gateway/src/main/java/com/wangyutao/gateway/config/NettyConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/config/RedisConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/config/RedisConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/listener/MessageStoreListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/listener/MessageStoreListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/MessageService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/MessageService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/MessageServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/java/com/wangyutao/messaging/service/impl/MessageServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Messaging/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/Messaging/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RESUME - 副本.md" beforeDir="false" afterPath="$PROJECT_DIR$/RESUME - 副本.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/ConfigEnum.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/enums/ConfigEnum.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettySessionManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/RealTimeCommunication/src/main/java/com/wangyutao/realtimecommunication/websocket/NettySessionManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/batch_login.sh" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/batch_login.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/im_chain_test.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/im_chain_test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/send_msg.lua" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/send_msg.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/ws_load_test.js" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/ws_load_test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -230,12 +226,12 @@
     </configuration>
     <list>
       <item itemvalue="Spring Boot.AuthenticationServiceApplication" />
-      <item itemvalue="Spring Boot.ContactApplication" />
-      <item itemvalue="Spring Boot.GatewayApplication" />
       <item itemvalue="Spring Boot.MessagingApplication" />
-      <item itemvalue="Spring Boot.MomentApplication" />
-      <item itemvalue="Spring Boot.OfflineServiceApplication" />
       <item itemvalue="Spring Boot.RealTimeCommunicationApplication" />
+      <item itemvalue="Spring Boot.GatewayApplication" />
+      <item itemvalue="Spring Boot.OfflineServiceApplication" />
+      <item itemvalue="Spring Boot.ContactApplication" />
+      <item itemvalue="Spring Boot.MomentApplication" />
     </list>
     <recent_temporary>
       <list>
@@ -284,7 +280,15 @@
       <option name="project" value="LOCAL" />
       <updated>1773414719209</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="最终版">
+      <option name="closed" value="true" />
+      <created>1774505033948</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1774505033948</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -300,7 +304,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="登录、网关、推送模块" />
-    <option name="LAST_COMMIT_MESSAGE" value="登录、网关、推送模块" />
+    <MESSAGE value="最终版" />
+    <option name="LAST_COMMIT_MESSAGE" value="最终版" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

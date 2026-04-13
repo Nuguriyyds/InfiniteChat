@@ -5,8 +5,6 @@ import com.wangyutao.messaging.model.entity.Message;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.wangyutao.messaging.model.vo.ResponseMsgVo;
 import com.wangyutao.messaging.model.vo.SyncMessageVo;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +15,6 @@ import java.util.Map;
 */
 public interface MessageService extends IService<Message> {
 
-    @Transactional(rollbackFor = Exception.class)
     ResponseMsgVo sendMessage(SendMsgRequest request);
 
     List<SyncMessageVo> syncMessages(String sessionId, Long beginSeq, Long endSeq);

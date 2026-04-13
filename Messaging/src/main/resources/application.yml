@@ -1,5 +1,10 @@
 server:
   port: 8084 # 🌟 注意：这里不要和上面的 8083 冲突
+  tomcat:
+    threads:
+      max: 400
+      min-spare: 50
+    accept-count: 200
 
 spring:
   application:
@@ -17,10 +22,10 @@ spring:
     password: e65K4t8w2
     lettuce:
       pool:
-        max-active: 32
-        max-idle: 16
-        min-idle: 8
-        max-wait: 200ms
+        max-active: 128
+        max-idle: 64
+        min-idle: 16
+        max-wait: 500ms
 
   # 🌟 新增：MySQL 数据库配置 (用于 im_message 聊天记录落盘)
   datasource:

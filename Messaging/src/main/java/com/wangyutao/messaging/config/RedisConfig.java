@@ -4,49 +4,82 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisPassword;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettucePoolingClientConfiguration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
+
 @SpringBootConfiguration
 public class RedisConfig {
 
-    /*
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        // 创建 Lettuce 连接工厂，连接到本地 Redis
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("172.30.233.168", 59000);
-        config.setPassword(RedisPassword.of("e65K4t8w2"));
-        return new LettuceConnectionFactory(config);
+    @Primary
+    public RedisConnectionFactory redisConnectionFactory(RedisProperties redisProperties) {
+        RedisStandaloneConfiguration standaloneConfiguration = new RedisStandaloneConfiguration();
+        standaloneConfiguration.setHostName(redisProperties.getHost());
+        standaloneConfiguration.setPort(redisProperties.getPort());
+        standaloneConfiguration.setDatabase(redisProperties.getDatabase());
+        if (redisProperties.getUsername() != null) {
+            standaloneConfiguration.setUsername(redisProperties.getUsername());
+        }
+        if (redisProperties.getPassword() != null) {
+            standaloneConfiguration.setPassword(RedisPassword.of(redisProperties.getPassword()));
+        }
+
+        GenericObjectPoolConfig<?> poolConfig = new GenericObjectPoolConfig<>();
+        if (redisProperties.getLettuce() != null && redisProperties.getLettuce().getPool() != null) {
+            RedisProperties.Pool pool = redisProperties.getLettuce().getPool();
+            poolConfig.setMaxTotal(pool.getMaxActive());
+            poolConfig.setMaxIdle(pool.getMaxIdle());
+            poolConfig.setMinIdle(pool.getMinIdle());
+            if (pool.getMaxWait() != null) {
+                poolConfig.setMaxWait(pool.getMaxWait());
+            }
+        }
+
+        Duration commandTimeout = redisProperties.getTimeout() != null
+                ? redisProperties.getTimeout()
+                : Duration.ofSeconds(2);
+
+        LettucePoolingClientConfiguration clientConfiguration = LettucePoolingClientConfiguration.builder()
+                .poolConfig(poolConfig)
+                .commandTimeout(commandTimeout)
+                .build();
+
+        return new LettuceConnectionFactory(standaloneConfiguration, clientConfiguration);
     }
-     */
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory){
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        //设置value的序列化方式json
         redisTemplate.setValueSerializer(redisSerializer());
-        //设置key序列化方式String
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        //设置hash key序列化方式String
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-        //设置hash value序列化json
         redisTemplate.setHashValueSerializer(redisSerializer());
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
     }
 
     public RedisSerializer<Object> redisSerializer() {
-        //创建JSON序列化器
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        //必须设置，否则无法序列化实体类对象
-        objectMapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
+        objectMapper.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL
+        );
         return new GenericJackson2JsonRedisSerializer(objectMapper);
     }
 }

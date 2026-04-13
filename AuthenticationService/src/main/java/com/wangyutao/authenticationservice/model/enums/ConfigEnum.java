@@ -24,6 +24,7 @@ public enum ConfigEnum {
     NETTY_SERVER_HEAD("nettyServerHead", "im:route:"),
     NETTY_SERVER("nettyServer","RealTimeCommunicationService"),
     REDIS_CONVERT_SEND("redisConvertSend","userLogout"),
+    RTC_NODE_LOAD_ZSET("rtcNodeLoadZset", "im:rtc:load"),
 
     // RTC WebSocket 直连地址配置
     NETTY_WS_PROTOCOL_METADATA_KEY("nettyWsProtocolMetadataKey", "ws-protocol"),

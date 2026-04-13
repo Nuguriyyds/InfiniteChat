@@ -38,7 +38,7 @@ function printHelp() {
     'Options:',
     '  --gateway-base=<url>         HTTP gateway base URL',
     '  --ws-url=<url>               RTC direct WS URL',
-    '  --tokens=<path>              tokens.txt path (userId|token)',
+    '  --tokens=<path>              tokens.txt path (userId|token|nettyUrl)',
     '  --send-data=<path>           send_msg_data.txt path (userId|token|sessionId|receiveUserId)',
     '  --scenario=<online|offline|both>',
     '  --case-index=<n>             Start from the nth valid single-chat case',
@@ -185,10 +185,11 @@ function loadTokens(tokenFile) {
     }
     const userId = parts[0].trim();
     const token = parts[1].trim();
+    const wsUrl = parts[2] ? parts[2].trim() : '';
     if (!userId || !token) {
       continue;
     }
-    tokenMap.set(userId, token);
+    tokenMap.set(userId, { token, wsUrl });
   }
 
   return tokenMap;
@@ -835,12 +836,12 @@ async function main() {
 
   try {
     if (options.scenario === 'online' || options.scenario === 'both') {
-      const receiverToken = tokenMap.get(onlineCase.receiverId);
+      const receiverInfo = tokenMap.get(onlineCase.receiverId);
       const onlineReport = await runOnlineScenario(
         onlineCase,
-        receiverToken,
+        receiverInfo.token,
         options.gatewayBase,
-        options.wsUrl,
+        receiverInfo.wsUrl || options.wsUrl,
         options
       );
       reports.push(summarizeResult(onlineReport));
@@ -848,10 +849,10 @@ async function main() {
     }
 
     if (options.scenario === 'offline' || options.scenario === 'both') {
-      const receiverToken = tokenMap.get(offlineCase.receiverId);
+      const receiverInfo = tokenMap.get(offlineCase.receiverId);
       const offlineReport = await runOfflineScenario(
         offlineCase,
-        receiverToken,
+        receiverInfo.token,
         options.gatewayBase,
         options
       );

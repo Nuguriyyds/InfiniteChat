@@ -16,11 +16,15 @@ const DEFAULTS = {
   reconnect: true,
   reconnectDelayMs: 1000,
   reconnectMaxDelayMs: 10000,
+  reconnectBackoffFactor: 2,
+  reconnectJitterMs: 1000,
   maxReconnectAttempts: 0,
   ackPush: true,
   replyServerPing: true,
   verbose: false
 };
+
+const AUTH_REJECT_CLOSE_CODES = new Set([1008, 4001, 4003, 4401]);
 
 function printHelp() {
   console.log([
@@ -38,6 +42,8 @@ function printHelp() {
     '  --reconnect=<true|false>          Reconnect automatically after close',
     '  --reconnect-delay-ms=<ms>         Initial reconnect delay',
     '  --reconnect-max-delay-ms=<ms>     Max reconnect backoff',
+    '  --reconnect-backoff-factor=<n>    Exponential reconnect multiplier (>= 1)',
+    '  --reconnect-jitter-ms=<ms>        Add random jitter on top of reconnect delay',
     '  --max-reconnect-attempts=<n>      0 means unlimited reconnect attempts',
     '  --ack-push=<true|false>           Send ACK frame when a push contains messageId',
     '  --reply-server-ping=<true|false>  Reply heartbeat when server sends SERVER_PING',
@@ -49,7 +55,7 @@ function printHelp() {
     '  node scripts/ws_load_test.js --connections=300 --reconnect=true --report-ms=2000',
     '',
     'Notes:',
-    '  1. This script expects tokens.txt lines in the format userId|token.',
+    '  1. This script expects tokens.txt lines in the format userId|token|nettyUrl (the third column is optional).',
     '  2. By default it follows the formal contract and connects directly to RTC with ?token= auth.',
     '  3. If you want to test the retained Gateway proxy entry, pass --url=ws://127.0.0.1:10010/api/v1/chat/message explicitly.',
     '  4. Do not reuse the same user for multiple concurrent connections; the server supports single-login kickout.',
@@ -75,6 +81,14 @@ function parseNumber(value, key) {
   const num = Number(value);
   if (!Number.isFinite(num) || num < 0) {
     throw new Error(`Invalid number for --${key}: ${value}`);
+  }
+  return num;
+}
+
+function parseFactor(value, key) {
+  const num = Number(value);
+  if (!Number.isFinite(num) || num < 1) {
+    throw new Error(`Invalid factor for --${key}: ${value}`);
   }
   return num;
 }
@@ -110,8 +124,12 @@ function parseArgs(argv) {
       case 'connectTimeoutMs':
       case 'reconnectDelayMs':
       case 'reconnectMaxDelayMs':
+      case 'reconnectJitterMs':
       case 'maxReconnectAttempts':
         options[key] = parseNumber(rawValue, rawKey);
+        break;
+      case 'reconnectBackoffFactor':
+        options[key] = parseFactor(rawValue, rawKey);
         break;
       case 'reconnect':
       case 'ackPush':
@@ -145,11 +163,12 @@ function loadEntries(tokenFile) {
 
     const userId = parts[0].trim();
     const token = parts[1].trim();
+    const wsUrl = parts[2] ? parts[2].trim() : '';
     if (!userId || !token || map.has(userId)) {
       continue;
     }
 
-    map.set(userId, { userId, token });
+    map.set(userId, { userId, token, wsUrl });
   }
 
   return Array.from(map.values());
@@ -189,6 +208,25 @@ function mapToCompactString(map) {
     .join(',');
 }
 
+function buildReconnectDelay(options, attemptNumber) {
+  const exponent = Math.max(0, attemptNumber - 1);
+  const cappedDelay = Math.min(
+    options.reconnectDelayMs * Math.pow(options.reconnectBackoffFactor, exponent),
+    options.reconnectMaxDelayMs
+  );
+
+  const maxDelay = Math.min(
+    options.reconnectMaxDelayMs,
+    cappedDelay + options.reconnectJitterMs
+  );
+  const minDelay = Math.min(options.reconnectDelayMs, cappedDelay);
+  if (maxDelay <= minDelay) {
+    return minDelay;
+  }
+
+  return minDelay + Math.floor(Math.random() * (maxDelay - minDelay + 1));
+}
+
 function createStats() {
   return {
     startedAt: now(),
@@ -216,6 +254,7 @@ function createClient(entry, index) {
     index,
     userId: entry.userId,
     token: entry.token,
+    wsUrl: entry.wsUrl,
     ws: null,
     isOpen: false,
     reconnectCount: 0,
@@ -322,19 +361,19 @@ function createHarness(options, entries, WebSocketImpl) {
       return;
     }
 
-    if (options.maxReconnectAttempts > 0 && client.reconnectCount >= options.maxReconnectAttempts) {
+    const nextAttempt = client.reconnectCount + 1;
+    if (options.maxReconnectAttempts > 0 && nextAttempt > options.maxReconnectAttempts) {
       verbose(`client#${client.index} user=${client.userId} reached max reconnect attempts`);
       return;
     }
 
-    const exponent = Math.min(client.reconnectCount, 5);
-    const delay = Math.min(
-      options.reconnectDelayMs * Math.pow(2, exponent),
-      options.reconnectMaxDelayMs
-    );
-
-    client.reconnectCount += 1;
+    const delay = buildReconnectDelay(options, nextAttempt);
+    client.reconnectCount = nextAttempt;
     stats.reconnectScheduled += 1;
+    verbose(
+      `schedule reconnect client#${client.index} user=${client.userId}` +
+      ` attempt=${nextAttempt} delay=${delay}ms`
+    );
 
     client.reconnectTimer = setTimeout(() => {
       connectClient(client, true);
@@ -388,7 +427,8 @@ function createHarness(options, entries, WebSocketImpl) {
     client.authRejected = false;
     client.lastError = null;
 
-    const wsUrl = buildWsUrl(options.url, client.token);
+    const baseUrl = client.wsUrl || options.url;
+    const wsUrl = buildWsUrl(baseUrl, client.token);
     stats.attemptedConnections += 1;
     if (isReconnect) {
       stats.reconnectAttempts += 1;
@@ -458,6 +498,9 @@ function createHarness(options, entries, WebSocketImpl) {
 
       client.lastCloseCode = code;
       client.lastCloseReason = reasonBuffer.toString();
+      if (AUTH_REJECT_CLOSE_CODES.has(code)) {
+        client.authRejected = true;
+      }
       stats.closeEvents += 1;
       incrementMapCounter(stats.closeCodes, code);
 
@@ -587,6 +630,10 @@ function main() {
     `  heartbeatMs=${options.heartbeatMs}`,
     `  reportMs=${options.reportMs}`,
     `  reconnect=${options.reconnect}`,
+    `  reconnectDelayMs=${options.reconnectDelayMs}`,
+    `  reconnectMaxDelayMs=${options.reconnectMaxDelayMs}`,
+    `  reconnectBackoffFactor=${options.reconnectBackoffFactor}`,
+    `  reconnectJitterMs=${options.reconnectJitterMs}`,
     `  ackPush=${options.ackPush}`,
     `  replyServerPing=${options.replyServerPing}`
   ].join('\n'));

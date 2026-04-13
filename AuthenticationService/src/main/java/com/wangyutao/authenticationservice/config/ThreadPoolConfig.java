@@ -5,7 +5,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Configuration
 public class ThreadPoolConfig {
@@ -25,6 +29,22 @@ public class ThreadPoolConfig {
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         // 初始化
         executor.initialize();
+        return executor;
+    }
+
+    @Bean("logoutCompensationScheduler")
+    public ScheduledExecutorService logoutCompensationScheduler() {
+        AtomicInteger counter = new AtomicInteger(1);
+        ThreadFactory threadFactory = task -> {
+            Thread thread = new Thread(task);
+            thread.setName("logout-compensation-" + counter.getAndIncrement());
+            thread.setDaemon(true);
+            return thread;
+        };
+
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(4, threadFactory);
+        executor.setRemoveOnCancelPolicy(true);
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         return executor;
     }
 }

@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -55,6 +56,9 @@ public class UserServiceImpl implements UserService {
 
     @Qualifier("ioThreadPool")
     private final Executor ioThreadPool;
+
+    @Qualifier("logoutCompensationScheduler")
+    private final ScheduledExecutorService logoutCompensationScheduler;
 
     private final UserBalanceMapper userBalanceMapper;
     private final UserMapper userMapper;
@@ -187,17 +191,18 @@ public class UserServiceImpl implements UserService {
 
         String luaScript =
                 "local oldNodeId = redis.call('get', KEYS[2]); " +
-                "redis.call('del', KEYS[1]); " +
-                "redis.call('del', KEYS[2]); " +
-                "if oldNodeId and oldNodeId ~= '' and oldNodeId ~= 'OFFLINE' then " +
-                "    redis.call('publish', KEYS[3], oldNodeId .. ':' .. ARGV[1]); " +
-                "else " +
-                "    redis.call('publish', KEYS[3], ARGV[1]); " +
-                "end; " +
-                "return oldNodeId";
+                        "redis.call('del', KEYS[1]); " +
+                        "redis.call('del', KEYS[2]); " +
+                        "if oldNodeId and oldNodeId ~= '' and oldNodeId ~= 'OFFLINE' then " +
+                        "    redis.call('publish', KEYS[3], oldNodeId .. ':' .. ARGV[1]); " +
+                        "else " +
+                        "    redis.call('publish', KEYS[3], ARGV[1]); " +
+                        "end; " +
+                        "return oldNodeId";
 
+        final String oldNodeId;
         try {
-            String oldNodeId = redisTemplate.execute(
+            oldNodeId = redisTemplate.execute(
                     new DefaultRedisScript<>(luaScript, String.class),
                     Arrays.asList(
                             "RT:" + userIdStr,
@@ -212,28 +217,46 @@ public class UserServiceImpl implements UserService {
             throw new BusinessException(ErrorEnum.SYSTEM_ERROR);
         }
 
-        CompletableFuture.runAsync(() -> {
+        logoutCompensationScheduler.schedule(() -> {
             try {
-                Thread.sleep(1000);
+                if (oldNodeId == null || oldNodeId.isEmpty()) {
+                    return;
+                }
+
                 String routeKey = ConfigEnum.NETTY_SERVER_HEAD.getValue() + userIdStr;
                 String remainingRoute = redisTemplate.opsForValue().get(routeKey);
-                if (remainingRoute != null) {
-                    redisTemplate.delete(routeKey);
-                    if (!"OFFLINE".equals(remainingRoute)) {
-                        redisTemplate.convertAndSend(
-                                ConfigEnum.REDIS_CONVERT_SEND.getValue(),
-                                remainingRoute + ":" + userIdStr
-                        );
-                    } else {
-                        redisTemplate.convertAndSend(ConfigEnum.REDIS_CONVERT_SEND.getValue(), userIdStr);
-                    }
-                    log.info("登出补偿完成: userId={}, remainingRoute={}", userIdStr, remainingRoute);
+
+                if (!oldNodeId.equals(remainingRoute)) {
+                    return;
+                }
+
+                Long cleaned = redisTemplate.execute(
+                        new DefaultRedisScript<>(
+                                "if redis.call('get', KEYS[1]) == ARGV[1] then " +
+                                        "    redis.call('del', KEYS[1]) " +
+                                        "    return 1 " +
+                                        "else " +
+                                        "    return 0 " +
+                                        "end",
+                                Long.class
+                        ),
+                        Collections.singletonList(routeKey),
+                        oldNodeId
+                );
+
+                if (Long.valueOf(1L).equals(cleaned)) {
+                    redisTemplate.convertAndSend(
+                            ConfigEnum.REDIS_CONVERT_SEND.getValue(),
+                            oldNodeId + ":" + userIdStr
+                    );
+                    log.info("登出补偿完成，清理脏路由: userId={}, oldNodeId={}", userIdStr, oldNodeId);
                 }
             } catch (Exception e) {
                 log.warn("登出补偿失败: userId={}", userIdStr, e);
             }
-        }, ioThreadPool);
+        }, 1, TimeUnit.SECONDS);
     }
+
 
     @Override
     public UserVO refreshToken(Long userId, String clientRefreshToken) {
