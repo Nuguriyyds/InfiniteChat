@@ -1,7 +1,7 @@
 security:
   internal-request:
     header-name: X-Internal-Auth
-    secret: ${INTERNAL_REQUEST_SECRET:infinitechat_internal_auth_2026}
+    secret: ${INTERNAL_REQUEST_SECRET}
 
 server:
   port: 8082
@@ -12,16 +12,16 @@ spring:
   cloud:
     nacos:
       server-addr: 172.30.233.168:18375
-      username: nacos
-      password: nacos
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:}
       discovery:
         ip: 172.31.130.141
   #      server-addr: common-nacos-dev.magestack.cn:8848
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://172.30.233.168:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: gK3T9n%q2M@j7Z4
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
     hikari:
       # ?????????
       maximum-pool-size: 30
@@ -47,12 +47,12 @@ spring:
     database: 0
     host: 172.30.233.168
     port: 6399
-    password: e65K4t8w2
+    password: ${REDIS_PASSWORD:}
 
 minio:
   url: http://172.30.233.168:9000
-  access-key: minioadmin
-  secret-key: minioadmin
+  access-key: ${MINIO_ACCESS_KEY:}
+  secret-key: ${MINIO_SECRET_KEY:}
 
 redisson:
   # ??Redisson????????????
@@ -92,7 +92,7 @@ redisson:
     # ??????????????
     retryInterval: 1500  # ????????1500?1.5??
 
-    password: "e65K4t8w2"
+    password: "${REDIS_PASSWORD:}"
     database: 0
 
 #  ??????????????health?metrics?

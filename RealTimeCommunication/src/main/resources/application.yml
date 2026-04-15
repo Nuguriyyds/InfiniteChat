@@ -4,8 +4,8 @@ spring:
   cloud:
     nacos:
       server-addr: 172.30.233.168:18375
-      username: nacos
-      password: nacos
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:}
       discovery:
         ip: 172.31.130.141
         metadata:
@@ -15,7 +15,7 @@ spring:
   redis:
     host: 172.30.233.168
     port: 6399
-    password: e65K4t8w2
+    password: ${REDIS_PASSWORD:}
 
 server:
   port: 8083 # 供内部微服务调用的 HTTP Push 接口端口

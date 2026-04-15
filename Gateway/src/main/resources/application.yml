@@ -1,7 +1,7 @@
 security:
   internal-request:
     header-name: X-Internal-Auth
-    secret: ${INTERNAL_REQUEST_SECRET:infinitechat_internal_auth_2026}
+    secret: ${INTERNAL_REQUEST_SECRET}
 
 server:
   port: 10010 # 🌟 记住这个端口！Postman 全靠它了！
@@ -14,14 +14,14 @@ spring:
   redis:
     host: 172.30.233.168
     port: 6399
-    password: e65K4t8w2
+    password: ${REDIS_PASSWORD:}
     database: 0
   cloud:
     nacos:
       # 🌟 修复：Nacos 层级语法修正
       server-addr: 172.30.233.168:18375
-      username: nacos
-      password: nacos
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:}
       discovery:
         ip: 172.31.130.141
     gateway:

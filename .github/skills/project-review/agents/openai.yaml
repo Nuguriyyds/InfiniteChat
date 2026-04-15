@@ -1,0 +1,4 @@
+interface:
+  display_name: "InfiniteChat Project Review"
+  short_description: "老师式带练 InfiniteChat 项目复习与面试问答"
+  default_prompt: "Use $project-review to run a chapter-by-chapter InfiniteChat project review and track progress."

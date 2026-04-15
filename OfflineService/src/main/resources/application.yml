@@ -7,20 +7,20 @@ spring:
   cloud:
     nacos:
       server-addr: 172.30.233.168:18375
-      username: nacos
-      password: nacos
+      username: ${NACOS_USERNAME:nacos}
+      password: ${NACOS_PASSWORD:}
       discovery:
         ip: 172.31.130.141
   redis:
     host: 172.30.233.168
     port: 6399
-    password: e65K4t8w2
+    password: ${REDIS_PASSWORD:}
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://172.30.233.168:49152/InfiniteChat?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: gK3T9n%q2M@j7Z4
+    username: ${MYSQL_USERNAME:root}
+    password: ${MYSQL_PASSWORD:}
     hikari:
       maximum-pool-size: 30
       minimum-idle: 10
