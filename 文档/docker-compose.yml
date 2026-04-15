@@ -1,0 +1,149 @@
+networks:
+  infinitechat_default:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  minio_data:
+  nacos_data:
+
+services:
+
+  # ==================== MySQL ====================
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'gK3T9n%q2M@j7Z4'
+      MYSQL_DATABASE: InfiniteChat
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports:
+      - '49152:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - infinitechat_default
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== Redis ====================
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --requirepass e65K4t8w2
+    ports:
+      - '6399:6379'
+    networks:
+      - infinitechat_default
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'e65K4t8w2', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== RocketMQ NameServer ====================
+  rmqnamesrv:
+    image: apache/rocketmq:5.0.0
+    container_name: rmqnamesrv
+    restart: unless-stopped
+    command: sh mqnamesrv
+    ports:
+      - '9876:9876'
+    networks:
+      - infinitechat_default
+
+  # ==================== RocketMQ Broker ====================
+  rmqbroker:
+    image: apache/rocketmq:5.0.0
+    container_name: rmqbroker
+    restart: unless-stopped
+    command: sh mqbroker -c /home/rocketmq/broker.conf
+    environment:
+      NAMESRV_ADDR: rmqnamesrv:9876
+      JAVA_OPT_EXT: "-server -Xms512m -Xmx512m -Xmn256m"
+    ports:
+      - '10909:10909'
+      - '10911:10911'
+    volumes:
+      - ./broker.conf:/home/rocketmq/broker.conf
+    networks:
+      - infinitechat_default
+    depends_on:
+      - rmqnamesrv
+    deploy:
+      resources:
+        limits:
+          memory: 750M
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
+  # ==================== RocketMQ Dashboard ====================
+  rmqdashboard:
+    image: styletang/rocketmq-console-ng:1.0.0
+    container_name: rmqdashboard
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: '-Drocketmq.namesrv.addr=rmqnamesrv:9876'
+    ports:
+      - '8080:8080'
+    networks:
+      - infinitechat_default
+    depends_on:
+      - rmqnamesrv
+
+  # ==================== Nacos ====================
+  nacos:
+    image: nacos/nacos-server:v2.1.0-slim
+    container_name: nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      NACOS_AUTH_ENABLE: 'true'
+      NACOS_AUTH_TOKEN: SecretKey012345678901234567890123456789012345678901234567
+      NACOS_AUTH_IDENTITY_KEY: nacos
+      NACOS_AUTH_IDENTITY_VALUE: nacos
+    ports:
+      - '18375:8848'
+      - '19375:9848'
+    volumes:
+      - nacos_data:/home/nacos/data
+    networks:
+      - infinitechat_default
+
+  # ==================== MinIO ====================
+  minio:
+    image: minio/minio:RELEASE.2025-02-18T16-25-55Z
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address :9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - minio_data:/data
+    networks:
+      - infinitechat_default
+
+  # ==================== pgvector (AgentService 专用) ====================
+  pgvector:
+    image: pgvector/pgvector:pg15
+    container_name: pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: e65K4t7z1
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - '54328:5432'
+    volumes:
+      - C:/docker/pgvector/data:/var/lib/postgresql/data/pgdata
+    networks:
+      - infinitechat_default
